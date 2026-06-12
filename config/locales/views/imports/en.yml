@@ -31,6 +31,7 @@ en:
       show:
         title: Select accounts to import
         description: "Tick the sheets you want to import and map each one to an account. Already-known accounts are matched automatically; uncheck anything you don't want (e.g. a card account you already sync)."
+        settlement_note: "Aggregate deferred-card lines (\"RELEVE CARTE\") are skipped automatically so they don't double-count your itemized card spending."
         finalize_upload: Please finalize your file upload.
         invalid_file: "We couldn't read this spreadsheet: %{message}"
         none_title: No importable accounts found

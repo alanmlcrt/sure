@@ -26,6 +26,7 @@ cpt["D5"], cpt["E5"], cpt["F5"], cpt["G5"] = "Débit", "Crédit", "Solde", "Dev"
 cpt_rows = [
     (datetime.date(2025, 12, 31), datetime.date(2026, 1, 1), "INTERETS 2025", None, 12.34, None, "EUR"),
     (datetime.date(2026, 1, 15), datetime.date(2026, 1, 15), "PAIEMENT CB CARREFOUR", -45.67, None, None, "EUR"),
+    (datetime.date(2026, 1, 29), datetime.date(2026, 1, 29), "RELEVE CARTE", -100.00, None, None, "EUR"),  # deferred-card aggregate -> skipped
     (datetime.date(2026, 2, 1), datetime.date(2026, 2, 1), "NOUVEAU TAUX", None, 0, None, "EUR"),  # zero -> skipped
 ]
 for i, row in enumerate(cpt_rows, start=6):
@@ -54,7 +55,7 @@ manifest.sheet_state = "veryHidden"
 manifest["A1"] = "Nombre de compte"
 manifest["A2"] = 2
 manifest["A3"], manifest["B3"], manifest["C3"] = "Nom du compte", "Range", "Type"
-manifest["A4"], manifest["B4"], manifest["C4"] = "Cpt 02619 00099999901", "A6:E8", "cpt"
+manifest["A4"], manifest["B4"], manifest["C4"] = "Cpt 02619 00099999901", "A6:E9", "cpt"
 manifest["A5"], manifest["B5"], manifest["C5"] = "CB 02619 00099999901 # 052026", "A7:C9", "cb"
 
 out = "test/fixtures/files/imports/sample_bank_export.xlsx"

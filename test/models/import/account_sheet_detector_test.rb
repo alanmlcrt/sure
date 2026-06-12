@@ -39,6 +39,14 @@ class Import::AccountSheetDetectorTest < ActiveSupport::TestCase
     assert_equal "EUR", txns.first[:currency]
   end
 
+  test "skips deferred-card settlement aggregate lines but keeps real card payments" do
+    cpt = @detector.detected_sheets.find { |s| s.type == :cpt }
+    names = @detector.transactions(cpt).map { |t| t[:name] }
+
+    assert_not_includes names, "RELEVE CARTE"          # aggregate, would double-count
+    assert_includes names, "PAIEMENT CB CARREFOUR"     # itemized purchase, kept
+  end
+
   test "parses signed card amounts" do
     cb = @detector.detected_sheets.find { |s| s.type == :cb }
     txns = @detector.transactions(cb)
