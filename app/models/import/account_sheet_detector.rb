@@ -28,18 +28,6 @@ class Import::AccountSheetDetector
   # code, a space, then the 11-digit account number.
   ACCOUNT_NUMBER_RE = /(\d{5}\s+\d{6,})/
 
-  # Deferred-debit card monthly settlement lines on a current-account sheet
-  # (CM/CIC label these exactly "RELEVE CARTE", e.g. "RELEVE CARTE  -994,53").
-  # That lump sum is the same money as the itemized card purchases on the card
-  # statement, so importing both double-counts spending. We skip the aggregate
-  # and keep the detail. Deliberately narrow: it must NOT match real entries
-  # like "PAIEMENT ... CARTE 8166", "RETRAIT DAB ... CARTE", "FRAIS PAIE CB"
-  # or "F MODIF. PLAFOND CARTE".
-  CARD_SETTLEMENT_PATTERNS = [
-    /\Areleve\s+carte\b/,
-    /\Atotal\s+des\s+depenses\s+cartes\b/
-  ].freeze
-
   SAMPLE_SIZE = 5
 
   DetectedSheet = Struct.new(
@@ -217,12 +205,9 @@ class Import::AccountSheetDetector
         amount = row_amount(cells, columns)
         next if amount.nil? || amount.zero? # skip blank/informational lines
 
-        name = cells[columns[:name]].to_s.strip
-        next if card_settlement?(name) # skip deferred-card aggregate lines
-
         result << {
           date: date,
-          name: name,
+          name: cells[columns[:name]].to_s.strip,
           amount: amount,
           currency: (cells[columns[:currency]].presence || currency)
         }
@@ -307,13 +292,6 @@ class Import::AccountSheetDetector
 
     def row_has?(cells, normalized_needle)
       (cells || {}).any? { |_col, value| normalize(value).include?(normalized_needle) }
-    end
-
-    # True for deferred-card monthly settlement aggregate lines (see
-    # CARD_SETTLEMENT_PATTERNS) that would double-count itemized card spending.
-    def card_settlement?(name)
-      normalized = normalize(name)
-      CARD_SETTLEMENT_PATTERNS.any? { |pattern| pattern.match?(normalized) }
     end
 
     def find_row(matrix)
