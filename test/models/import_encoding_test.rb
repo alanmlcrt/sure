@@ -72,4 +72,20 @@ class ImportEncodingTest < ActiveSupport::TestCase
     assert_equal Encoding::UTF_8, import.raw_file_str.encoding
     assert import.raw_file_str.valid_encoding?
   end
+
+  test "normalizes non-UTF-8 uploads persisted with validate: false" do
+    # Mirrors Import::UploadsController#update, which saves with validate: false.
+    # A Latin-1/Windows-1252 CSV (é => 0xe9) must not reach Postgres raw.
+    latin1 = "date;name;amount\n2026-01-01;Café;-1,00\n".encode("ISO-8859-1").b
+    refute latin1.dup.force_encoding("UTF-8").valid_encoding?, "fixture must be invalid UTF-8"
+
+    import = @family.imports.create!(
+      type: "TransactionImport", account: @account, date_format: "%Y-%m-%d", col_sep: ";"
+    )
+    import.assign_attributes(raw_file_str: latin1)
+
+    assert_nothing_raised { import.save!(validate: false) }
+    assert_equal Encoding::UTF_8, import.reload.raw_file_str.encoding
+    assert import.raw_file_str.valid_encoding?, "stored CSV should be valid UTF-8"
+  end
 end

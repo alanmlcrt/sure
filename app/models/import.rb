@@ -44,7 +44,11 @@ class Import < ApplicationRecord
   belongs_to :import_session, optional: true
 
   before_validation :set_default_number_format
-  before_validation :ensure_utf8_encoding
+  # before_save (not before_validation) so non-UTF-8 uploads are normalized even
+  # on the upload path, which persists with save(validate: false). Otherwise a
+  # Latin-1/Windows-1252 CSV (common for French bank exports) hits Postgres raw
+  # and raises PG::CharacterNotInRepertoire. The method is idempotent.
+  before_save :ensure_utf8_encoding
   normalizes :client_chunk_id, with: ->(value) { value.strip.presence }
 
   scope :ordered, -> { order(created_at: :desc) }
