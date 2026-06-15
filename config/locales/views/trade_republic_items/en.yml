@@ -1,0 +1,55 @@
+---
+en:
+  trade_republic_items:
+    account_names:
+      cash: "Trade Republic Cash"
+      securities: "Trade Republic Portfolio"
+
+    # Syncer status messages
+    sync:
+      status:
+        importing: "Importing data from Trade Republic..."
+        processing: "Processing holdings..."
+        calculating: "Calculating balances..."
+        needs_setup: "%{count} accounts need setup..."
+      success: "Sync started"
+
+    # Controller flash messages
+    initiate_auth:
+      success: "Verification code sent"
+    complete_auth:
+      success: "Trade Republic connected successfully"
+      no_pending_login: "No login in progress. Please start again."
+    complete_account_setup:
+      success:
+        one: "Successfully created %{count} account."
+        other: "Successfully created %{count} accounts."
+      all_skipped: "All accounts were skipped. No accounts were created."
+      creation_failed: "Failed to create accounts: %{error}"
+      no_accounts: "No accounts to set up."
+    destroy:
+      success: "Scheduled Trade Republic connection for deletion."
+
+    # Provider item display (used in _trade_republic_item partial and panel)
+    trade_republic_item:
+      sync_status:
+        no_accounts: "Connected — set up your accounts"
+        all_synced:
+          one: "%{count} account synced"
+          other: "%{count} accounts synced"
+        partial_sync: "%{linked_count} synced, %{unlinked_count} need setup"
+
+    # Setup accounts wizard
+    setup_accounts:
+      title: "Set Up Your Trade Republic Accounts"
+      subtitle: "Choose which Trade Republic accounts to import"
+      instructions: "Select the accounts you want to import from Trade Republic. You can choose multiple accounts."
+      accounts_count:
+        one: "%{count} account available"
+        other: "%{count} accounts available"
+      balance: "Balance"
+      import_selected: "Import selected accounts"
+      creating: "Creating accounts..."
+      cancel: "Cancel"
+      no_accounts_to_setup: "No Accounts to Set Up"
+      no_accounts: "No unlinked accounts found from this Trade Republic connection."

@@ -1,0 +1,17 @@
+<div id="<%= dom_id(trade_republic_item) %>" class="flex items-center justify-between gap-3 p-3 border border-primary rounded-lg">
+  <div class="flex items-center gap-3 min-w-0">
+    <div class="flex items-center justify-center h-8 w-8 rounded-full bg-surface-inset">
+      <%= icon "trending-up", size: "sm", class: "text-primary" %>
+    </div>
+    <div class="min-w-0">
+      <p class="font-medium text-primary truncate"><%= trade_republic_item.institution_display_name %></p>
+      <p class="text-xs text-secondary">
+        <% if trade_republic_item.syncing? %>
+          <%= t("settings.providers.trade_republic_panel.syncing") %>
+        <% else %>
+          <%= trade_republic_item.sync_status_summary %>
+        <% end %>
+      </p>
+    </div>
+  </div>
+</div>

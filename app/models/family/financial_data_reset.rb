@@ -57,6 +57,7 @@ class Family::FinancialDataReset
     simplefin_items
     snaptrade_items
     sophtron_items
+    trade_republic_items
     up_items
   ].freeze
 

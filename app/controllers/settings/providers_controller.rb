@@ -200,6 +200,7 @@ class Settings::ProvidersController < ApplicationController
       { key: "ibkr",           title: "Interactive Brokers", turbo_id: "ibkr",      partial: "ibkr_panel" },
       { key: "trading212",     title: "Trading 212",     turbo_id: "trading212", partial: "trading212_panel" },
       { key: "indexa_capital", title: "Indexa Capital",  turbo_id: "indexa_capital", partial: "indexa_capital_panel" },
+      { key: "trade_republic", title: "Trade Republic",  turbo_id: "trade_republic", partial: "trade_republic_panel" },
       { key: "sophtron",       title: "Sophtron",        turbo_id: "sophtron",       partial: "sophtron_panel" },
       { key: "questrade",      title: "Questrade",       turbo_id: "questrade",      partial: "questrade_panel" }
     ].freeze
@@ -227,6 +228,7 @@ class Settings::ProvidersController < ApplicationController
       "ibkr"           => "IbkrItem",
       "trading212"     => "Trading212Item",
       "indexa_capital" => "IndexaCapitalItem",
+      "trade_republic" => "TradeRepublicItem",
       "sophtron"       => "SophtronItem"
     }.freeze
 
@@ -268,6 +270,8 @@ class Settings::ProvidersController < ApplicationController
         @trading212_items = Current.family.trading212_items.ordered
       when "indexa_capital"
         @indexa_capital_items = Current.family.indexa_capital_items.ordered
+      when "trade_republic"
+        @trade_republic_items = Current.family.trade_republic_items.ordered
       when "sophtron"
         @sophtron_items = Current.family.sophtron_items.ordered
       when "questrade"
@@ -301,6 +305,7 @@ class Settings::ProvidersController < ApplicationController
       @ibkr_items = Current.family.ibkr_items.ordered.select(:id)
       @trading212_items = Current.family.trading212_items.ordered.select(:id)
       @indexa_capital_items = Current.family.indexa_capital_items.ordered.select(:id)
+      @trade_republic_items = Current.family.trade_republic_items.ordered
       @binance_items = Current.family.binance_items.active.ordered
       @kraken_items = Current.family.kraken_items.active.ordered
       @onchain_wallet_items = Current.family.onchain_wallet_items.active.ordered
@@ -341,6 +346,7 @@ class Settings::ProvidersController < ApplicationController
         "ibkr"           => @ibkr_items,
         "trading212"     => @trading212_items,
         "indexa_capital" => @indexa_capital_items,
+        "trade_republic" => @trade_republic_items,
         "sophtron"       => @sophtron_items
       }
     end
