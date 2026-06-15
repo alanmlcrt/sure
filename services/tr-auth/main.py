@@ -73,27 +73,32 @@ async def get_waf_token() -> Optional[str]:
         )
 
         try:
-            await page.goto(TR_APP, wait_until="networkidle", timeout=20000)
-        except Exception:
-            await page.wait_for_timeout(5000)
-
-        waf_token = None
-        try:
-            waf_token = await page.evaluate(
-                "window.AWSWafIntegration ? window.AWSWafIntegration.getToken() : null"
-            )
-            if waf_token:
-                log.info("Got WAF token via AWSWafIntegration.getToken()")
+            await page.goto(TR_APP, wait_until="domcontentloaded", timeout=20000)
         except Exception:
             pass
 
-        if not waf_token:
-            cookies = await context.cookies()
-            for cookie in cookies:
-                if "aws-waf-token" in cookie.get("name", "").lower():
-                    waf_token = cookie["value"]
-                    log.info("Got WAF token from cookie")
-                    break
+        # The WAF challenge resolves asynchronously, so a single read often misses
+        # it. Poll the JS API + cookie for up to ~20s before giving up.
+        waf_token = None
+        for _ in range(20):
+            try:
+                waf_token = await page.evaluate(
+                    "window.AWSWafIntegration ? window.AWSWafIntegration.getToken() : null"
+                )
+            except Exception:
+                waf_token = None
+
+            if not waf_token:
+                for cookie in await context.cookies():
+                    if "aws-waf-token" in cookie.get("name", "").lower():
+                        waf_token = cookie["value"]
+                        break
+
+            if waf_token:
+                log.info("Got WAF token")
+                break
+
+            await page.wait_for_timeout(1000)
 
         await browser.close()
 
