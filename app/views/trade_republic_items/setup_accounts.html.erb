@@ -1,0 +1,93 @@
+<% content_for :title, t("trade_republic_items.setup_accounts.title") %>
+
+<%= render DS::Dialog.new(disable_click_outside: true) do |dialog| %>
+  <% dialog.with_header(title: t("trade_republic_items.setup_accounts.title")) do %>
+    <div class="flex items-center gap-2">
+      <%= icon "trending-up", class: "text-primary" %>
+      <span class="text-primary"><%= t("trade_republic_items.setup_accounts.subtitle") %></span>
+    </div>
+  <% end %>
+
+  <% dialog.with_body do %>
+    <div class="space-y-6">
+      <div class="bg-surface border border-primary p-4 rounded-lg">
+        <div class="flex items-start gap-3">
+          <%= icon "info", size: "sm", class: "text-primary mt-0.5 flex-shrink-0" %>
+          <p class="text-sm text-primary"><%= t("trade_republic_items.setup_accounts.instructions") %></p>
+        </div>
+      </div>
+
+      <%= form_with url: complete_account_setup_trade_republic_item_path(@trade_republic_item),
+                    method: :post,
+                    data: {
+                      controller: "loading-button",
+                      action: "submit->loading-button#showLoading",
+                      loading_button_loading_text_value: t("trade_republic_items.setup_accounts.creating"),
+                      turbo_frame: "_top"
+                    } do |form| %>
+
+        <% if @unlinked_accounts.any? %>
+          <div class="space-y-4">
+            <h3 class="font-medium text-primary"><%= t("trade_republic_items.setup_accounts.accounts_count", count: @unlinked_accounts.count) %></h3>
+
+            <% @unlinked_accounts.each do |tr_account| %>
+              <div class="border border-primary rounded-lg p-4 hover:bg-surface transition-colors">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox"
+                         id="account_<%= tr_account.id %>"
+                         name="account_ids[]"
+                         value="<%= tr_account.id %>"
+                         checked
+                         class="cursor-pointer">
+                  <label for="account_<%= tr_account.id %>" class="flex-1 cursor-pointer">
+                    <h4 class="font-medium text-primary"><%= tr_account.name %></h4>
+                    <p class="text-sm text-secondary">
+                      <%= tr_account.inferred_accountable_type %> &middot;
+                      <%= t("trade_republic_items.setup_accounts.balance") %>:
+                      <%= number_to_currency(tr_account.current_balance || 0, unit: Money::Currency.new(tr_account.currency || "EUR").symbol) %>
+                    </p>
+                  </label>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="flex gap-3 mt-6">
+            <%= render DS::Button.new(
+              text: t("trade_republic_items.setup_accounts.import_selected"),
+              variant: "primary",
+              icon: "plus",
+              type: "submit",
+              class: "flex-1",
+              data: { loading_button_target: "button" }
+            ) %>
+            <%= render DS::Link.new(
+              text: t("trade_republic_items.setup_accounts.cancel"),
+              variant: "secondary",
+              href: accounts_path,
+              frame: "_top"
+            ) %>
+          </div>
+        <% else %>
+          <div class="flex flex-col items-center justify-center py-6 space-y-3">
+            <%= icon "alert-circle", size: "lg", class: "text-warning" %>
+            <p class="text-primary text-center font-medium">
+              <%= t("trade_republic_items.setup_accounts.no_accounts_to_setup") %>
+            </p>
+            <p class="text-secondary text-center text-sm">
+              <%= t("trade_republic_items.setup_accounts.no_accounts") %>
+            </p>
+          </div>
+          <div class="flex gap-3 justify-center">
+            <%= render DS::Link.new(
+              text: t("trade_republic_items.setup_accounts.cancel"),
+              variant: "secondary",
+              href: accounts_path,
+              frame: "_top"
+            ) %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

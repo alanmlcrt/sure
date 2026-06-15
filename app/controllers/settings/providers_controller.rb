@@ -195,6 +195,7 @@ class Settings::ProvidersController < ApplicationController
       { key: "snaptrade",      title: "SnapTrade",       turbo_id: "snaptrade",      partial: "snaptrade_panel", auto_open: "manage" },
       { key: "ibkr",           title: "Interactive Brokers", turbo_id: "ibkr",      partial: "ibkr_panel" },
       { key: "indexa_capital", title: "Indexa Capital",  turbo_id: "indexa_capital", partial: "indexa_capital_panel" },
+      { key: "trade_republic", title: "Trade Republic",  turbo_id: "trade_republic", partial: "trade_republic_panel" },
       { key: "sophtron",       title: "Sophtron",        turbo_id: "sophtron",       partial: "sophtron_panel" }
     ].freeze
 
@@ -215,6 +216,7 @@ class Settings::ProvidersController < ApplicationController
       "snaptrade"      => "SnaptradeItem",
       "ibkr"           => "IbkrItem",
       "indexa_capital" => "IndexaCapitalItem",
+      "trade_republic" => "TradeRepublicItem",
       "sophtron"       => "SophtronItem"
     }.freeze
 
@@ -246,6 +248,8 @@ class Settings::ProvidersController < ApplicationController
         @ibkr_items = Current.family.ibkr_items.ordered
       when "indexa_capital"
         @indexa_capital_items = Current.family.indexa_capital_items.ordered
+      when "trade_republic"
+        @trade_republic_items = Current.family.trade_republic_items.ordered
       when "sophtron"
         @sophtron_items = Current.family.sophtron_items.ordered
       end
@@ -273,6 +277,7 @@ class Settings::ProvidersController < ApplicationController
       @snaptrade_items = Current.family.snaptrade_items.ordered
       @ibkr_items = Current.family.ibkr_items.ordered.select(:id)
       @indexa_capital_items = Current.family.indexa_capital_items.ordered.select(:id)
+      @trade_republic_items = Current.family.trade_republic_items.ordered
       @binance_items = Current.family.binance_items.active.ordered
       @kraken_items = Current.family.kraken_items.active.ordered
 
@@ -305,6 +310,7 @@ class Settings::ProvidersController < ApplicationController
         "snaptrade"      => @snaptrade_items,
         "ibkr"           => @ibkr_items,
         "indexa_capital" => @indexa_capital_items,
+        "trade_republic" => @trade_republic_items,
         "sophtron"       => @sophtron_items
       }
     end

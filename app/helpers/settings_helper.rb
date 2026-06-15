@@ -100,6 +100,9 @@ module SettingsHelper
     when "indexa_capital"
       return { status: :off } unless @indexa_capital_items&.any?
       sync_based_summary(key)
+    when "trade_republic"
+      return { status: :off } unless @trade_republic_items&.any?(&:credentials_configured?)
+      sync_based_summary(key)
     when "sophtron"
       return { status: :off } unless @sophtron_items&.any?
       sync_based_summary(key)

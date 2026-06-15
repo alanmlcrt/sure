@@ -58,6 +58,8 @@ x-rails-env: &rails_env
   REDIS_URL: redis://redis:6379/1
   # NOTE: enabling OpenAI will incur costs when you use AI-related features in the app (chat, rules).  Make sure you have set appropriate spend limits on your account before adding this.
   OPENAI_ACCESS_TOKEN: ${OPENAI_ACCESS_TOKEN}
+  # Trade Republic sidecar (handles the WAF login + WebSocket portfolio fetch).
+  TR_AUTH_URL: ${TR_AUTH_URL:-http://tr-auth:8001}
 
 services:
   web:
@@ -150,6 +152,18 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - sure_net
+
+  # Trade Republic auth + portfolio sidecar.
+  # Required only if you connect a Trade Republic account (Settings → Bank Sync).
+  # Bundles a headless Chromium (Playwright) to solve the AWS WAF challenge, so
+  # the image is large and the first build takes a while.
+  tr-auth:
+    build:
+      context: ./services/tr-auth
+      dockerfile: Dockerfile
+    restart: unless-stopped
     networks:
       - sure_net
 

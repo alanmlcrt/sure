@@ -1,0 +1,120 @@
+<div id="trade_republic-providers-panel" class="space-y-4">
+  <%
+    items = local_assigns[:trade_republic_items] || @trade_republic_items || Current.family.trade_republic_items.ordered
+    connected_item = items.find { |i| i.credentials_configured? }
+    awaiting_tan = local_assigns[:awaiting_tan] || false
+    error_msg = local_assigns[:error_message] || @error_message
+  %>
+
+  <%= render "settings/providers/setup_steps",
+             steps: [
+               t("settings.providers.trade_republic_panel.step_1"),
+               t("settings.providers.trade_republic_panel.step_2"),
+               t("settings.providers.trade_republic_panel.step_3")
+             ] %>
+
+  <%= render DS::Alert.new(
+        variant: :warning,
+        message: safe_join([
+          content_tag(:p, t("settings.providers.trade_republic_panel.unofficial_title"), class: "font-medium"),
+          content_tag(:p, t("settings.providers.trade_republic_panel.unofficial_body"), class: "mt-1")
+        ])
+      ) %>
+
+  <% if error_msg.present? %>
+    <%= render DS::Alert.new(message: error_msg, variant: :error) %>
+  <% end %>
+
+  <% if connected_item.present? %>
+    <%= render DS::Disclosure.new(variant: :card) do |disclosure| %>
+      <% disclosure.with_summary_content do %>
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="flex items-center justify-center h-8 w-8 rounded-full bg-surface-inset">
+            <%= icon "trending-up", size: "sm", class: "text-primary" %>
+          </div>
+          <div class="min-w-0">
+            <p class="font-medium text-primary truncate"><%= connected_item.institution_display_name %></p>
+            <p class="text-xs text-secondary">
+              <% if connected_item.syncing? %>
+                <%= t("settings.providers.trade_republic_panel.syncing") %>
+              <% else %>
+                <%= connected_item.sync_status_summary %>
+              <% end %>
+            </p>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <%= button_to sync_trade_republic_item_path(connected_item),
+                      method: :post,
+                      class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-secondary hover:text-primary border border-secondary rounded-lg hover:border-primary",
+                      disabled: connected_item.syncing? do %>
+          <%= icon "refresh-cw", size: "sm" %>
+          <%= t("settings.providers.trade_republic_panel.sync") %>
+        <% end %>
+
+        <% if connected_item.pending_account_setup? || connected_item.unlinked_accounts_count.positive? %>
+          <%= render DS::Link.new(
+            text: t("settings.providers.trade_republic_panel.setup_accounts"),
+            icon: "settings",
+            variant: "secondary",
+            href: setup_accounts_trade_republic_item_path(connected_item),
+            frame: :modal
+          ) %>
+        <% end %>
+
+        <%= button_to trade_republic_item_path(connected_item),
+                      method: :delete,
+                      class: "inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-lg",
+                      data: { turbo_confirm: t("settings.providers.trade_republic_panel.disconnect_confirm") } do %>
+          <%= icon "trash-2", size: "sm" %>
+          <%= t("settings.providers.trade_republic_panel.disconnect") %>
+        <% end %>
+      </div>
+    <% end %>
+
+  <% elsif awaiting_tan %>
+    <%= styled_form_with url: complete_auth_trade_republic_items_path,
+                         scope: :trade_republic,
+                         method: :post,
+                         data: { turbo: true },
+                         class: "space-y-3" do |form| %>
+      <p class="text-sm text-secondary"><%= t("settings.providers.trade_republic_panel.tan_help") %></p>
+
+      <%= form.text_field :tan,
+                          label: t("settings.providers.trade_republic_panel.fields.tan.label"),
+                          placeholder: t("settings.providers.trade_republic_panel.fields.tan.placeholder"),
+                          inputmode: "numeric",
+                          autocomplete: "one-time-code" %>
+
+      <div class="flex justify-end">
+        <%= form.submit t("settings.providers.trade_republic_panel.verify_button") %>
+      </div>
+    <% end %>
+
+  <% else %>
+    <%= styled_form_with url: initiate_auth_trade_republic_items_path,
+                         scope: :trade_republic,
+                         method: :post,
+                         data: { turbo: true },
+                         class: "space-y-3" do |form| %>
+      <%= form.text_field :phone_number,
+                          label: t("settings.providers.trade_republic_panel.fields.phone.label"),
+                          placeholder: t("settings.providers.trade_republic_panel.fields.phone.placeholder"),
+                          inputmode: "tel",
+                          autocomplete: "off" %>
+
+      <%= form.text_field :pin,
+                          label: t("settings.providers.trade_republic_panel.fields.pin.label"),
+                          placeholder: t("settings.providers.trade_republic_panel.fields.pin.placeholder"),
+                          type: :password,
+                          inputmode: "numeric",
+                          autocomplete: "off" %>
+
+      <div class="flex justify-end">
+        <%= form.submit t("settings.providers.trade_republic_panel.connect_button") %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

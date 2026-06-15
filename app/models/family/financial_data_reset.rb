@@ -54,6 +54,7 @@ class Family::FinancialDataReset
     simplefin_items
     snaptrade_items
     sophtron_items
+    trade_republic_items
   ].freeze
 
   Result = Struct.new(:user, :family, :dry_run, :before_counts, :deleted_counts, :after_counts, keyword_init: true)

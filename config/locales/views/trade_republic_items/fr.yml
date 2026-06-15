@@ -1,0 +1,55 @@
+---
+fr:
+  trade_republic_items:
+    account_names:
+      cash: "Trade Republic Liquidités"
+      securities: "Portefeuille Trade Republic"
+
+    # Messages de statut du syncer
+    sync:
+      status:
+        importing: "Import des données depuis Trade Republic..."
+        processing: "Traitement des positions..."
+        calculating: "Calcul des soldes..."
+        needs_setup: "%{count} comptes à configurer..."
+      success: "Synchronisation lancée"
+
+    # Messages flash du contrôleur
+    initiate_auth:
+      success: "Code de vérification envoyé"
+    complete_auth:
+      success: "Trade Republic connecté avec succès"
+      no_pending_login: "Aucune connexion en cours. Veuillez recommencer."
+    complete_account_setup:
+      success:
+        one: "%{count} compte créé avec succès."
+        other: "%{count} comptes créés avec succès."
+      all_skipped: "Tous les comptes ont été ignorés. Aucun compte créé."
+      creation_failed: "Échec de la création des comptes : %{error}"
+      no_accounts: "Aucun compte à configurer."
+    destroy:
+      success: "Suppression de la connexion Trade Republic planifiée."
+
+    # Affichage de la connexion (partial _trade_republic_item et panneau)
+    trade_republic_item:
+      sync_status:
+        no_accounts: "Connecté — configurez vos comptes"
+        all_synced:
+          one: "%{count} compte synchronisé"
+          other: "%{count} comptes synchronisés"
+        partial_sync: "%{linked_count} synchronisés, %{unlinked_count} à configurer"
+
+    # Assistant de configuration des comptes
+    setup_accounts:
+      title: "Configurez vos comptes Trade Republic"
+      subtitle: "Choisissez les comptes Trade Republic à importer"
+      instructions: "Sélectionnez les comptes que vous souhaitez importer depuis Trade Republic. Vous pouvez en choisir plusieurs."
+      accounts_count:
+        one: "%{count} compte disponible"
+        other: "%{count} comptes disponibles"
+      balance: "Solde"
+      import_selected: "Importer les comptes sélectionnés"
+      creating: "Création des comptes..."
+      cancel: "Annuler"
+      no_accounts_to_setup: "Aucun compte à configurer"
+      no_accounts: "Aucun compte non lié trouvé pour cette connexion Trade Republic."

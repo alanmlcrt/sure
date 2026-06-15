@@ -350,6 +350,7 @@ en:
         snaptrade: Connect brokerage accounts via the SnapTrade aggregation network.
         ibkr: Sync Interactive Brokers investment accounts via Flex Query imports.
         indexa_capital: Track your Indexa Capital automated investment portfolio.
+        trade_republic: Sync your Trade Republic cash and securities portfolio.
         sophtron: Connect US & Canadian banks and utilities.
         plaid: Connect thousands of US financial institutions via Plaid.
         plaid_eu: Connect European financial institutions via Plaid (PSD2 / Open Banking).
@@ -424,6 +425,30 @@ en:
         sync: Sync
         disconnect: Disconnect
         disconnect_confirm: "Are you sure you want to disconnect %{name}?"
+      trade_republic_panel:
+        step_1: "Enter the phone number and PIN you use in the Trade Republic app"
+        step_2: "Approve the login by entering the 2FA code Trade Republic sends you"
+        step_3: "After connecting, open the Accounts tab to set up your cash and portfolio accounts"
+        unofficial_title: "Unofficial connection"
+        unofficial_body: "Trade Republic has no public API. Sure connects through a reverse-engineered login and reads balances only — it never trades or moves money. Your phone number and PIN are used once to log in and are never stored."
+        fields:
+          phone:
+            label: Phone number
+            placeholder: "+33 6 12 34 56 78"
+          pin:
+            label: PIN
+            placeholder: Your Trade Republic PIN
+          tan:
+            label: 2FA code
+            placeholder: 4-digit code
+        tan_help: "Enter the verification code Trade Republic just sent to your phone or app."
+        connect_button: Connect Trade Republic
+        verify_button: Verify code
+        setup_accounts: Set up accounts
+        syncing: Syncing...
+        sync: Sync
+        disconnect: Disconnect
+        disconnect_confirm: "Are you sure you want to disconnect Trade Republic? Your synced accounts will become manual accounts."
       enable_banking_panel:
         callback_url_instruction: "For the callback URL, use %{callback_url}."
         connection_error: Connection Error

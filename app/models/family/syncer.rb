@@ -22,6 +22,7 @@ class Family::Syncer
     binance_items
     snaptrade_items
     sophtron_items
+    trade_republic_items
   ].freeze
 
   def initialize(family)
