@@ -160,9 +160,7 @@ services:
   # Bundles a headless Chromium (Playwright) to solve the AWS WAF challenge, so
   # the image is large and the first build takes a while.
   tr-auth:
-    build:
-      context: ./services/tr-auth
-      dockerfile: Dockerfile
+    image: ghcr.io/alanmlcrt/sure-tr-auth:latest
     restart: unless-stopped
     networks:
       - sure_net
