@@ -94,6 +94,9 @@ class XlsxImport < Import
 
     mapped_rows.each_with_index { |r, i| r[:source_row_number] = i + 1 }
     Import::Row.insert_all!(mapped_rows) if mapped_rows.any?
+    # destroy_all loaded the (now empty) rows association and insert_all! bypasses
+    # it, leaving a stale cache. Reset so later rows.each (in import!) re-queries.
+    rows.reset
     update_column(:rows_count, rows.count)
   end
 
