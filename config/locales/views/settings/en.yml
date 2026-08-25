@@ -333,6 +333,7 @@ en:
       feedback_label: Feedback
       general_section_title: General
       imports_label: Imports
+      import_exclusions_label: Import exclusions
       exports_label: Exports
       llm_usage_label: LLM Usage
       logout: Logout

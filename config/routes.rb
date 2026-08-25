@@ -484,6 +484,8 @@ Rails.application.routes.draw do
     resources :mappings, only: :update, module: :import
   end
 
+  resources :import_exclusions, only: %i[index create destroy]
+
   resources :holdings, only: %i[index new show update destroy] do
     member do
       post :unlock_cost_basis

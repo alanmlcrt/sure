@@ -92,6 +92,7 @@ class XlsxImport < Import
       end
     end
 
+    mapped_rows.reject! { |r| excluded_row_name?(r[:name]) }
     mapped_rows.each_with_index { |r, i| r[:source_row_number] = i + 1 }
     Import::Row.insert_all!(mapped_rows) if mapped_rows.any?
     # destroy_all loaded the (now empty) rows association and insert_all! bypasses

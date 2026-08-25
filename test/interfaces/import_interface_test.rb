@@ -92,6 +92,25 @@ module ImportInterfaceTest
     assert_equal "1234.56", row.amount
   end
 
+  test "skips rows whose name matches a family import exclusion" do
+    import = imports(:transaction)
+    import.family.import_exclusions.create!(name: "RELEVE CARTE")
+    import.update!(
+      amount_col_label: "amount",
+      date_col_label: "date",
+      name_col_label: "name",
+      date_format: "%m/%d/%Y"
+    )
+
+    csv_data = "date,amount,name\n01/01/2024,10,RELEVE CARTE\n01/02/2024,20,Groceries"
+    import.update!(raw_file_str: csv_data)
+    import.generate_rows_from_csv
+    import.reload
+
+    assert_equal 1, import.rows_count
+    assert_equal "Groceries", import.rows.first.name
+  end
+
   test "parses French/Scandinavian number format correctly" do
     import = imports(:transaction)
     import.update!(

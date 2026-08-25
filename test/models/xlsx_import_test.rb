@@ -91,6 +91,18 @@ class XlsxImportTest < ActiveSupport::TestCase
     assert @import.complete?
   end
 
+  test "skips rows whose name matches a family import exclusion" do
+    @family.import_exclusions.create!(name: "interets 2025") # case-insensitive match
+    cpt = @import.detected_sheets.find { |s| s.type == :cpt }
+
+    @import.apply_sheet_selections!([
+      { "sheet_name" => cpt.sheet_name, "selected" => "1", "account_id" => "new", "account_name" => "Checking FR" }
+    ])
+
+    assert_equal 1, @import.rows_count
+    assert_equal "PAIEMENT CB CARREFOUR", @import.rows.first.name
+  end
+
   test "import flow hooks" do
     assert_equal %i[date name amount currency], @import.column_keys
     assert_empty @import.mapping_steps

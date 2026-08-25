@@ -404,6 +404,8 @@ class Import < ApplicationRecord
       }
     end
 
+    mapped_rows.reject! { |r| excluded_row_name?(r[:name]) }
+
     rows.insert_all!(mapped_rows)
     update_column(:rows_count, rows.count)
   end
@@ -584,6 +586,16 @@ class Import < ApplicationRecord
 
     def default_currency
       account&.currency || family.currency
+    end
+
+    # Matches names the family has permanently excluded (see ImportExclusion),
+    # so a re-import doesn't recreate a transaction the user deleted on purpose.
+    def excluded_row_name?(name)
+      excluded_row_names.include?(name.to_s.strip.downcase)
+    end
+
+    def excluded_row_names
+      @excluded_row_names ||= family.import_exclusions.pluck(:name).map { |n| n.downcase }.to_set
     end
 
     def csv_value(row, label, *aliases)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_08_22_130000) do
+ActiveRecord::Schema[7.2].define(version: 2026_08_25_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -970,6 +970,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_22_130000) do
     t.datetime "updated_at", null: false
     t.index ["impersonated_id"], name: "index_impersonation_sessions_on_impersonated_id"
     t.index ["impersonator_id"], name: "index_impersonation_sessions_on_impersonator_id"
+  end
+
+  create_table "import_exclusions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "family_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["family_id", "name"], name: "index_import_exclusions_on_family_id_and_name", unique: true
+    t.index ["family_id"], name: "index_import_exclusions_on_family_id"
   end
 
   create_table "import_mappings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2522,6 +2531,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_22_130000) do
   add_foreign_key "impersonation_session_logs", "impersonation_sessions"
   add_foreign_key "impersonation_sessions", "users", column: "impersonated_id"
   add_foreign_key "impersonation_sessions", "users", column: "impersonator_id"
+  add_foreign_key "import_exclusions", "families"
   add_foreign_key "import_rows", "imports"
   add_foreign_key "import_sessions", "families"
   add_foreign_key "import_source_mappings", "families"
