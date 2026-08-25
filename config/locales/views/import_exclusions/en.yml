@@ -1,0 +1,14 @@
+en:
+  import_exclusions:
+    index:
+      title: Import exclusions
+      description: Transaction names listed here are skipped on every future import (CSV or Excel), so you never have to delete them by hand again. The match is exact (case-insensitive).
+      name_placeholder: "e.g. RELEVE CARTE"
+      add: Add
+      empty: No exclusions yet
+      delete: Delete
+      delete_confirm: 'Stop ignoring "%{name}"? It will be imported again next time it appears in a file.'
+    create:
+      created: Exclusion added
+    destroy:
+      deleted: Exclusion removed

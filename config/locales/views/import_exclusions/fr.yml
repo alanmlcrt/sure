@@ -1,0 +1,15 @@
+---
+fr:
+  import_exclusions:
+    index:
+      title: Exclusions d'import
+      description: "Les noms de transaction listés ici sont ignorés à chaque futur import (CSV ou Excel), pour ne plus jamais avoir à les supprimer à la main. La correspondance est exacte (insensible à la casse)."
+      name_placeholder: "ex. RELEVE CARTE"
+      add: Ajouter
+      empty: Aucune exclusion pour le moment
+      delete: Supprimer
+      delete_confirm: 'Ne plus ignorer "%{name}" ? Elle sera de nouveau importée si elle réapparaît dans un fichier.'
+    create:
+      created: Exclusion ajoutée
+    destroy:
+      deleted: Exclusion supprimée
