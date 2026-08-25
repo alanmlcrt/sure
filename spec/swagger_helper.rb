@@ -225,6 +225,36 @@ RSpec.configure do |config|
               pagination: { '$ref' => '#/components/schemas/Pagination' }
             }
           },
+          Insight: {
+            type: :object,
+            required: %w[id type title body priority status],
+            properties: {
+              id: { type: :string, format: :uuid },
+              type: { type: :string },
+              title: { type: :string },
+              body: { type: :string },
+              priority: { type: :string, enum: %w[high medium low] },
+              status: { type: :string, enum: %w[active read] },
+              generated_at: { type: :string, format: :'date-time', nullable: true }
+            }
+          },
+          InsightCollection: {
+            type: :object,
+            required: %w[insights],
+            properties: {
+              insights: { type: :array, items: { '$ref' => '#/components/schemas/Insight' } }
+            }
+          },
+          PushSubscription: {
+            type: :object,
+            required: %w[id environment platform last_registered_at],
+            properties: {
+              id: { type: :string, format: :uuid },
+              environment: { type: :string, enum: %w[sandbox production] },
+              platform: { type: :string, enum: %w[ios] },
+              last_registered_at: { type: :string, format: :'date-time' }
+            }
+          },
           RetryResponse: {
             type: :object,
             required: %w[message message_id],
@@ -800,6 +830,7 @@ RSpec.configure do |config|
               notes: { type: :string, nullable: true },
               external_id: { type: :string, nullable: true },
               source: { type: :string, nullable: true },
+              user_modified: { type: :boolean },
               classification: { type: :string },
               account: { '$ref' => '#/components/schemas/Account' },
               category: { '$ref' => '#/components/schemas/Category', nullable: true },
@@ -859,6 +890,10 @@ RSpec.configure do |config|
               currency: { type: :string },
               transfer_type: { type: :string, enum: %w[transfer liability_payment loan_payment] },
               notes: { type: :string, nullable: true },
+              source_fee_amount: { type: :string, nullable: true, description: 'Fee charged to the source account' },
+              source_fee_currency: { type: :string, nullable: true },
+              destination_fee_amount: { type: :string, nullable: true, description: 'Fee deducted from the destination account' },
+              destination_fee_currency: { type: :string, nullable: true },
               inflow_transaction: { '$ref' => '#/components/schemas/TransferTransactionSide' },
               outflow_transaction: { '$ref' => '#/components/schemas/TransferTransactionSide' },
               created_at: { type: :string, format: :'date-time' },
@@ -929,6 +964,27 @@ RSpec.configure do |config|
             required: %w[message],
             properties: {
               message: { type: :string }
+            }
+          },
+          TransactionResponse: {
+            type: :object,
+            required: %w[id date amount currency name entryable_type account],
+            properties: {
+              id: { type: :string, format: :uuid },
+              date: { type: :string, format: :date },
+              amount: { type: :string },
+              currency: { type: :string },
+              name: { type: :string },
+              entryable_type: { type: :string },
+              account: {
+                type: :object,
+                required: %w[id name account_type],
+                properties: {
+                  id: { type: :string, format: :uuid },
+                  name: { type: :string },
+                  account_type: { type: :string, nullable: true }
+                }
+              }
             }
           },
           ImportConfiguration: {
@@ -1061,7 +1117,7 @@ RSpec.configure do |config|
             type: :object,
             required: %w[type valid content stats errors warnings],
             properties: {
-              type: { type: :string, enum: %w[TransactionImport TradeImport AccountImport MintImport ActualImport CategoryImport RuleImport SureImport] },
+              type: { type: :string, enum: Import::TYPES },
               valid: { type: :boolean },
               content: { '$ref' => '#/components/schemas/ImportPreflightContent' },
               stats: { '$ref' => '#/components/schemas/ImportPreflightStats' },
@@ -1125,7 +1181,7 @@ RSpec.configure do |config|
             required: %w[id type status created_at updated_at status_detail],
             properties: {
               id: { type: :string, format: :uuid },
-              type: { type: :string, enum: %w[TransactionImport TradeImport AccountImport MintImport ActualImport CategoryImport RuleImport SureImport] },
+              type: { type: :string, enum: Import::TYPES },
               status: { type: :string, enum: %w[pending complete importing reverting revert_failed failed] },
               created_at: { type: :string, format: :'date-time' },
               updated_at: { type: :string, format: :'date-time' },
@@ -1140,7 +1196,7 @@ RSpec.configure do |config|
             required: %w[id type status created_at updated_at status_detail configuration stats],
             properties: {
               id: { type: :string, format: :uuid },
-              type: { type: :string, enum: %w[TransactionImport TradeImport AccountImport MintImport ActualImport CategoryImport RuleImport SureImport] },
+              type: { type: :string, enum: Import::TYPES },
               status: { type: :string, enum: %w[pending complete importing reverting revert_failed failed] },
               created_at: { type: :string, format: :'date-time' },
               updated_at: { type: :string, format: :'date-time' },
