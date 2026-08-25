@@ -39,7 +39,7 @@ class Import < ApplicationRecord
 
   DOCUMENT_TYPES = %w[bank_statement credit_card_statement investment_statement financial_document contract other].freeze
 
-  TYPES = %w[TransactionImport TradeImport AccountImport MintImport ActualImport YnabImport CategoryImport RuleImport MerchantImport PdfImport QifImport SureImport].freeze
+  TYPES = %w[TransactionImport TradeImport AccountImport MintImport ActualImport YnabImport CategoryImport RuleImport MerchantImport PdfImport QifImport SureImport XlsxImport].freeze
   SIGNAGE_CONVENTIONS = %w[inflows_positive inflows_negative]
   SEPARATORS = [ [ "Comma (,)", "," ], [ "Semicolon (;)", ";" ] ].freeze
 
@@ -798,8 +798,11 @@ class Import < ApplicationRecord
     end
 
     def rows_to_skip_within_file_bounds
-      return if raw_file_str.blank?
       return if rows_to_skip.to_i == 0
+      # raw_file_str may still hold non-UTF-8 bytes here; it is normalized in the
+      # before_save callback. Skip the line-count check until the bytes are valid.
+      return unless raw_file_str&.valid_encoding?
+      return if raw_file_str.blank?
 
       line_count = raw_file_str.lines.count
 
