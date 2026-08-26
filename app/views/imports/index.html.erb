@@ -150,9 +150,15 @@
     <div class="mt-2 space-y-3">
       <p class="text-sm text-secondary"><%= t("import_exclusions.widget.description") %></p>
 
-      <%= form_with model: @import_exclusion, url: import_exclusions_path, class: "flex gap-2" do |f| %>
-        <%= f.text_field :name, placeholder: t("import_exclusions.widget.name_placeholder"), class: "flex-1 rounded-lg border border-secondary bg-container px-3 py-2 text-sm text-primary" %>
-        <%= render DS::Button.new(text: t("import_exclusions.widget.add"), type: :submit, variant: "secondary") %>
+      <%= form_with model: @import_exclusion, url: import_exclusions_path, class: "space-y-2" do |f| %>
+        <div class="flex gap-2">
+          <%= f.text_field :name, placeholder: t("import_exclusions.widget.name_placeholder"), class: "flex-1 rounded-lg border border-secondary bg-container px-3 py-2 text-sm text-primary" %>
+          <%= render DS::Button.new(text: t("import_exclusions.widget.add"), type: :submit, variant: "secondary") %>
+        </div>
+        <label class="flex items-center gap-2 text-sm text-secondary">
+          <%= check_box_tag "delete_existing", "1", false, class: "rounded border-secondary" %>
+          <%= t("import_exclusions.widget.delete_existing_label") %>
+        </label>
       <% end %>
 
       <% if @import_exclusions.any? %>

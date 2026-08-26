@@ -9,4 +9,22 @@ class ImportExclusion < ApplicationRecord
   normalizes :name, with: ->(value) { value.to_s.strip }
 
   validates :name, presence: true, uniqueness: { scope: :family_id, case_sensitive: false }
+
+  # Deletes existing transactions whose entry name exactly matches this
+  # exclusion (case-insensitive) -- for callers offering to apply a newly
+  # created exclusion retroactively, since the row-generation filter only
+  # protects future imports. Returns the number of entries destroyed.
+  def delete_matching_transactions!
+    entries = matching_entries.to_a
+    entries.each do |entry|
+      entry.destroy!
+      entry.sync_account_later
+    end
+    entries.size
+  end
+
+  private
+    def matching_entries
+      family.entries.where(entryable_type: "Transaction").where("LOWER(name) = ?", name.downcase)
+    end
 end
