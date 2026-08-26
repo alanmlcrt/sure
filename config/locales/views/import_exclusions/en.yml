@@ -2,12 +2,16 @@ en:
   import_exclusions:
     widget:
       title: Import exclusions
-      description: Transaction names listed here are skipped on every future import (CSV or Excel), so you never have to delete them by hand again. The match is exact (case-insensitive).
+      description: Skipped automatically on future imports.
       name_placeholder: "e.g. RELEVE CARTE"
       add: Add
+      delete_existing_label: Also delete existing transactions with this exact name
       delete: Delete
       delete_confirm: 'Stop ignoring "%{name}"? It will be imported again next time it appears in a file.'
     create:
       created: Exclusion added
+      created_with_deletions:
+        one: "Exclusion added. 1 existing transaction deleted."
+        other: "Exclusion added. %{count} existing transactions deleted."
     destroy:
       deleted: Exclusion removed

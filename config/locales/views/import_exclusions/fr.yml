@@ -3,12 +3,16 @@ fr:
   import_exclusions:
     widget:
       title: Exclusions d'import
-      description: "Les noms de transaction listés ici sont ignorés à chaque futur import (CSV ou Excel), pour ne plus jamais avoir à les supprimer à la main. La correspondance est exacte (insensible à la casse)."
+      description: "Ignorées automatiquement lors des prochains imports."
       name_placeholder: "ex. RELEVE CARTE"
       add: Ajouter
+      delete_existing_label: Supprimer aussi les transactions existantes portant exactement ce nom
       delete: Supprimer
       delete_confirm: 'Ne plus ignorer "%{name}" ? Elle sera de nouveau importée si elle réapparaît dans un fichier.'
     create:
       created: Exclusion ajoutée
+      created_with_deletions:
+        one: "Exclusion ajoutée. 1 transaction existante supprimée."
+        other: "Exclusion ajoutée. %{count} transactions existantes supprimées."
     destroy:
       deleted: Exclusion supprimée
