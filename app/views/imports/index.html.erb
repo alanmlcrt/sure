@@ -140,4 +140,38 @@
     <%= icon("plus") %>
     <%= t("imports.index.new") %>
   <% end %>
+
+  <details class="group mt-6">
+    <summary class="cursor-pointer text-sm text-secondary hover:text-primary flex items-center gap-1 py-2">
+      <%= icon "chevron-right", size: "sm", class: "group-open:rotate-90 transition-transform" %>
+      <%= t("import_exclusions.widget.title") %>
+    </summary>
+
+    <div class="mt-2 space-y-3">
+      <p class="text-sm text-secondary"><%= t("import_exclusions.widget.description") %></p>
+
+      <%= form_with model: @import_exclusion, url: import_exclusions_path, class: "flex gap-2" do |f| %>
+        <%= f.text_field :name, placeholder: t("import_exclusions.widget.name_placeholder"), class: "flex-1 rounded-lg border border-secondary bg-container px-3 py-2 text-sm text-primary" %>
+        <%= render DS::Button.new(text: t("import_exclusions.widget.add"), type: :submit, variant: "secondary") %>
+      <% end %>
+
+      <% if @import_exclusions.any? %>
+        <div class="rounded-lg bg-container-inset divide-y divide-alpha-black-200 theme-dark:divide-alpha-white-200">
+          <% @import_exclusions.each do |exclusion| %>
+            <div class="flex items-center justify-between gap-3 px-3 py-2">
+              <span class="text-sm text-primary font-mono truncate"><%= exclusion.name %></span>
+              <%= render DS::Button.new(
+                text: t("import_exclusions.widget.delete"),
+                href: import_exclusion_path(exclusion),
+                method: :delete,
+                variant: "outline_destructive",
+                size: "sm",
+                data: { turbo_confirm: t("import_exclusions.widget.delete_confirm", name: exclusion.name) }
+              ) %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </details>
 <% end %>

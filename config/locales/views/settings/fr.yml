@@ -543,7 +543,6 @@ fr:
       general_section_title: Général
       guides_label: Guides
       imports_label: Importations
-      import_exclusions_label: Exclusions d'import
       llm_usage_label: Utilisation LLM
       logout: Se déconnecter
       mcp_label: MCP
