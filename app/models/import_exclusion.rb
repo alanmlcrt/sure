@@ -25,6 +25,6 @@ class ImportExclusion < ApplicationRecord
 
   private
     def matching_entries
-      family.entries.where(entryable_type: "Transaction").where("LOWER(name) = ?", name.downcase)
+      family.entries.where(entryable_type: "Transaction").where("LOWER(entries.name) = ?", name.downcase)
     end
 end
