@@ -4,16 +4,21 @@ class Import::SheetSelectionsController < ApplicationController
   before_action :set_import
   before_action :ensure_xlsx_import
 
+  # Also serves the "Refresh" button (a GET of the same form) so edited
+  # rows-to-skip values re-read the tables without saving anything.
   def show
-    redirect_to import_upload_path(@import), alert: t(".finalize_upload") and return unless @import.uploaded?
+    redirect_to new_import_path, alert: t(".finalize_upload") and return unless @import.uploaded?
 
-    @detected_sheets = @import.detected_sheets
-    @accounts = accessible_accounts.manual.alphabetically
+    @import.assign_attributes(format_params) # keep the formats picked before a refresh
+    @selections = sheet_selection_params.index_by { |s| s["sheet_name"] }
+    @tables = @import.sheet_tables(rows_to_skip: @selections.transform_values { |s| s["rows_to_skip"] })
+    @accounts = accessible_accounts.visible.alphabetically
   rescue Import::XlsxWorkbook::Error => e
     redirect_to new_import_path, alert: t(".invalid_file", message: e.message)
   end
 
   def update
+    @import.update!(format_params)
     @import.apply_sheet_selections!(sheet_selection_params)
 
     if @import.rows_count.zero?
@@ -21,8 +26,8 @@ class Import::SheetSelectionsController < ApplicationController
     else
       redirect_to import_clean_path(@import), notice: t(".sheets_imported")
     end
-  rescue ActiveRecord::RecordInvalid => e
-    redirect_to import_sheet_selection_path(@import), alert: e.record.errors.full_messages.to_sentence.presence || e.message
+  rescue XlsxImport::SelectionError, ActiveRecord::RecordInvalid => e
+    redirect_to import_sheet_selection_path(@import), alert: e.message
   end
 
   private
@@ -34,12 +39,15 @@ class Import::SheetSelectionsController < ApplicationController
       redirect_to import_path(@import) unless @import.is_a?(XlsxImport)
     end
 
-    # params[:import][:sheets] is a hash keyed by index; each entry permits the
-    # sheet name, a selected flag, and the chosen account ("new" or a uuid).
+    def format_params
+      params.fetch(:import, {}).permit(:date_format, :number_format, :signage_convention)
+    end
+
+    # params[:import][:sheets] is a hash keyed by index, one entry per sheet.
     def sheet_selection_params
       sheets = params.dig(:import, :sheets) || {}
       sheets.values.map do |sheet|
-        sheet.permit(:sheet_name, :selected, :account_id, :account_name).to_h
+        sheet.permit(:sheet_name, :selected, :account_id, :account_name, :rows_to_skip, :date_col, :name_col, :amount_col).to_h
       end
     end
 end

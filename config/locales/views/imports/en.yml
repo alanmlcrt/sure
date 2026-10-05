@@ -29,21 +29,31 @@ en:
         submit: Continue to review
     sheet_selections:
       show:
-        title: Select accounts to import
-        description: "Tick the sheets you want to import and map each one to an account. Already-known accounts are matched automatically; uncheck anything you don't want (e.g. a card account you already sync)."
+        title: Select sheets to import
+        description: "Tick the sheets to import and map each one to an account. Title rows and columns are detected automatically: check them in the preview, and press Refresh after changing the rows to skip."
         finalize_upload: Please finalize your file upload.
         invalid_file: "We couldn't read this spreadsheet: %{message}"
-        none_title: No importable accounts found
-        none_description: We couldn't detect any account sheets in this spreadsheet. Make sure it's a bank export with one sheet per account.
+        none: This spreadsheet has no visible sheets with data.
         back_to_imports: Back to imports
-        known_account: Known account
-        account_number: Account no.
-        transactions_count:
-          one: "1 transaction"
-          other: "%{count} transactions"
+        date_format_label: Date format
+        number_format_label: Number format
+        signage_label: Amounts
+        incomes_are_positive: Incomes are positive
+        incomes_are_negative: Incomes are negative
+        formats_hint: Date and number formats only matter for cells stored as text; real Excel dates and numbers are read as-is.
+        rows_count:
+          one: "1 row"
+          other: "%{count} rows"
+        account_label: Account
         create_new_account: Create new account
         new_account_name_placeholder: New account name
-        import_selected: Import selected accounts
+        rows_to_skip_label: Rows to skip
+        date_col_label: Date column
+        name_col_label: Label column
+        amount_col_label: Amount column
+        no_column: "—"
+        refresh: Refresh
+        import_selected: Import selected sheets
       update:
         no_sheets_selected: Please select at least one sheet to import.
         sheets_imported: Sheets imported. Review your data below.
@@ -263,6 +273,11 @@ en:
         hint_html: Upload the <strong>all.ndjson</strong> file from your data export ZIP
         ndjson_invalid: Must be valid NDJSON with at least one record
   imports:
+    xlsx:
+      column: "Column %{number}"
+      computed_amount_header: "Amount (credit - debit)"
+      unknown_sheet: "Sheet %{sheet} was not found in the file."
+      missing_columns: "Choose a date and an amount column for sheet %{sheet}."
     mapping_labels:
       account_type: "Account Type"
       account: "Account"

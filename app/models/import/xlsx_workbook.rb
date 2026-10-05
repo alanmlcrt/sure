@@ -11,10 +11,9 @@
 #   - expose the shared-strings table
 #   - return a sheet's cells as a 1-based row/column matrix of raw values
 #
-# Date/number interpretation is deliberately left to the caller: callers know
-# the role of each column (e.g. "this column is a date") and can convert Excel
-# serial numbers via .excel_serial_to_date, which is more robust than guessing
-# from cell styles.
+# Cells come back typed: String, BigDecimal for numbers, and Date for numbers
+# whose cell style is a date format (Excel stores dates as day serials, so the
+# style is the only reliable signal).
 class Import::XlsxWorkbook
   Sheet = Struct.new(:name, :state, :rid, :path, keyword_init: true) do
     def hidden?
@@ -33,6 +32,9 @@ class Import::XlsxWorkbook
   # Excel's day 0 is 1899-12-31, but the 1900 leap-year bug means treating
   # 1899-12-30 as the epoch yields correct dates for all serials >= 60.
   EXCEL_EPOCH = Date.new(1899, 12, 30)
+
+  # Built-in numFmtIds that render as dates (incl. the CJK locale variants).
+  BUILTIN_DATE_FORMAT_IDS = [ 14..22, 27..36, 45..47, 50..58 ].flat_map(&:to_a).to_set.freeze
 
   class << self
     def open(content_or_io)
@@ -88,19 +90,13 @@ class Import::XlsxWorkbook
     sheets.reject(&:hidden?)
   end
 
-  # Visible sheets that could hold an account's transactions: excludes the
-  # summary tab. Used by the heuristic detector when there's no manifest.
-  def visible_account_candidate_sheets
-    visible_sheets.reject { |s| s.name == Import::AccountSheetDetector::SUMMARY_SHEET_NAME }
-  end
-
   def sheet(name)
     sheets.find { |s| s.name == name }
   end
 
   # Returns the sheet's cells as a Hash keyed by 1-based row number, each value
-  # a Hash keyed by 1-based column number => raw value (String for shared/inline
-  # strings, BigDecimal-friendly String for numbers, or nil for blanks).
+  # a Hash keyed by 1-based column number => value (String, BigDecimal, Date,
+  # or absent for blanks).
   #
   # max_rows lets callers cap reads on huge sheets (e.g. previews).
   def cell_matrix(name, max_rows: nil)
@@ -158,20 +154,51 @@ class Import::XlsxWorkbook
     end
 
     def cell_value(cell_node)
-      type = cell_node["t"]
+      raw = cell_node.at_xpath("ss:v", NS)&.text
 
-      case type
+      case cell_node["t"]
       when "s" # shared string
-        v = cell_node.at_xpath("ss:v", NS)&.text
-        return nil if v.nil?
-        shared_strings[v.to_i]
+        raw && shared_strings[raw.to_i]
       when "inlineStr"
         cell_node.at_xpath(".//ss:t", NS)&.text
-      when "str" # formula string result
-        cell_node.at_xpath("ss:v", NS)&.text
-      else # numeric (possibly a date serial) or formula with cached numeric value
-        cell_node.at_xpath("ss:v", NS)&.text
+      when "str", "b" # formula string result / boolean
+        raw
+      when "e" # error (#N/A, #DIV/0!...)
+        nil
+      when "d" # ISO 8601 date (rare, strict OOXML)
+        raw && Date.iso8601(raw[0, 10])
+      else # number, possibly a date serial
+        return nil if raw.blank?
+
+        if date_style_ids.include?(cell_node["s"].to_i)
+          self.class.excel_serial_to_date(raw)
+        else
+          BigDecimal(raw)
+        end
       end
+    rescue ArgumentError
+      raw
+    end
+
+    # Indexes into cellXfs whose number format displays a date.
+    def date_style_ids
+      @date_style_ids ||= if find_entry("xl/styles.xml")
+        doc = parse_xml(read_entry("xl/styles.xml"))
+        custom_formats = doc.xpath("//ss:numFmts/ss:numFmt", NS).to_h { |node| [ node["numFmtId"].to_i, node["formatCode"] ] }
+
+        doc.xpath("//ss:cellXfs/ss:xf", NS).each_with_index.filter_map do |xf, index|
+          id = xf["numFmtId"].to_i
+          index if BUILTIN_DATE_FORMAT_IDS.include?(id) || date_format_code?(custom_formats[id])
+        end.to_set
+      else
+        Set.new
+      end
+    end
+
+    # A custom format is a date if it has day/year tokens outside quoted
+    # literals, [color]/[locale] blocks and escaped characters.
+    def date_format_code?(code)
+      code.present? && code.gsub(/"[^"]*"|\[[^\]]*\]|\\./, "").match?(/[dy]/i)
     end
 
     def workbook_relationships

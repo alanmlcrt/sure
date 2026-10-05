@@ -28,7 +28,14 @@ class Import::XlsxWorkbookTest < ActiveSupport::TestCase
     assert_equal "Compte", matrix[3][1]
     assert_equal "R.I.B.", matrix[3][2]
     assert_equal "10278 02619 00099999901", matrix[4][2]
-    assert_equal "100", matrix[4][3].to_s.sub(/\.0\z/, "")
+    assert_equal BigDecimal("100"), matrix[4][3]
+  end
+
+  test "returns dates for date-formatted numeric cells" do
+    matrix = @workbook.cell_matrix("Cpt 02619 00099999901")
+
+    assert_equal Date.new(2025, 12, 31), matrix[6][1]
+    assert_equal BigDecimal("-45.67"), matrix[7][4]
   end
 
   test "excel_serial_to_date converts serials to dates" do

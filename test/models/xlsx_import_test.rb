@@ -4,7 +4,8 @@ class XlsxImportTest < ActiveSupport::TestCase
   include ActiveJob::TestHelper
 
   FIXTURE = "test/fixtures/files/imports/sample_bank_export.xlsx".freeze
-  ACCOUNT_KEY = "0261900099999901".freeze
+  CPT_SHEET = "Cpt 02619 00099999901".freeze
+  CB_SHEET = "CB 02619 00099999901 # 052026".freeze
 
   setup do
     @family = families(:dylan_family)
@@ -16,96 +17,142 @@ class XlsxImportTest < ActiveSupport::TestCase
     )
   end
 
-  test "uploaded? reflects the attachment" do
-    assert @import.uploaded?
+  test "reads every visible sheet, skipping title rows and guessing columns" do
+    tables = @import.sheet_tables.index_by(&:name)
+    assert_equal [ "Vos comptes", CPT_SHEET, CB_SHEET ], tables.keys
+
+    cpt = tables[CPT_SHEET]
+    assert_equal 4, cpt.rows_to_skip
+    assert_equal "Amount (credit - debit)", cpt.headers.last
+    assert_equal({ date: 0, name: 2, amount: 7 }, cpt.columns)
+    assert cpt.importable?
+
+    cb = tables[CB_SHEET]
+    assert_equal({ date: 0, name: 1, amount: 2 }, cb.columns)
+    assert_equal 3, cb.data.size # the "Carte Mastercard" sub-header line is dropped
+
+    assert_not tables["Vos comptes"].importable? # summary sheet has no dates
   end
 
-  test "detected_sheets reads the two account sheets" do
-    assert_equal 2, @import.detected_sheets.size
-  end
-
-  test "suggested_account_for matches an existing account by external_account_number" do
-    cpt = @import.detected_sheets.find { |s| s.type == :cpt }
-    assert_nil @import.suggested_account_for(cpt)
-
-    account = @family.accounts.create!(
-      name: "Existing", balance: 0, currency: "EUR",
-      accountable: Depository.new, external_account_number: ACCOUNT_KEY
-    )
-
-    assert_equal account, @import.suggested_account_for(cpt)
-  end
-
-  test "apply_sheet_selections creates a new account, persists the RIB, and generates rows" do
-    cpt = @import.detected_sheets.find { |s| s.type == :cpt }
-    selections = [
-      { "sheet_name" => cpt.sheet_name, "selected" => "1", "account_id" => "new", "account_name" => "My Checking" }
-    ]
+  test "imports several sheets into their accounts in one go" do
+    existing = accounts(:depository)
+    cpt, cb = @import.sheet_tables.index_by(&:name).values_at(CPT_SHEET, CB_SHEET)
 
     assert_difference -> { @family.accounts.count }, 1 do
-      @import.apply_sheet_selections!(selections)
+      @import.apply_sheet_selections!([
+        selection(cpt, "account_id" => "new", "account_name" => "Checking FR"),
+        selection(cb, "account_id" => existing.id),
+        { "sheet_name" => "Vos comptes", "selected" => "0" }
+      ])
     end
 
-    account = @family.accounts.find_by(external_account_number: ACCOUNT_KEY)
-    assert_equal "My Checking", account.name
-    assert_equal "EUR", account.currency
-    assert_equal 2, @import.rows_count # the zero-amount row is skipped
-    assert @import.rows.all? { |row| row.account == account.id }
-  end
+    checking = @family.accounts.find_by!(name: "Checking FR")
+    assert_equal 5, @import.rows_count # the zero-amount cpt line is skipped
+    assert_equal 2, @import.rows.where(account: checking.id).count
+    assert_equal 3, @import.rows.where(account: existing.id).count
 
-  test "unchecked sheets are not imported" do
-    selections = @import.detected_sheets.map do |sheet|
-      { "sheet_name" => sheet.sheet_name, "selected" => (sheet.type == :cpt ? "1" : "0"), "account_id" => "new" }
-    end
-
-    @import.apply_sheet_selections!(selections)
-
-    # Only the cpt sheet (2 non-zero rows) is imported; the cb sheet is skipped.
-    assert_equal 2, @import.rows_count
-  end
-
-  test "mapping to an existing account backfills its external_account_number" do
-    account = @family.accounts.create!(name: "Existing", balance: 0, currency: "EUR", accountable: Depository.new)
-    cpt = @import.detected_sheets.find { |s| s.type == :cpt }
-
-    @import.apply_sheet_selections!([
-      { "sheet_name" => cpt.sheet_name, "selected" => "1", "account_id" => account.id }
-    ])
-
-    assert_equal ACCOUNT_KEY, account.reload.external_account_number
-    assert_equal 2, @import.rows_count
-  end
-
-  test "publish imports transactions into the mapped account" do
-    cpt = @import.detected_sheets.find { |s| s.type == :cpt }
-    @import.apply_sheet_selections!([
-      { "sheet_name" => cpt.sheet_name, "selected" => "1", "account_id" => "new", "account_name" => "Checking FR" }
-    ])
-
-    account = @family.accounts.find_by(external_account_number: ACCOUNT_KEY)
-
-    assert_difference -> { account.entries.count }, 2 do
+    assert_difference -> { Entry.count }, 5 do
       @import.publish
     end
-
     assert @import.complete?
+    assert_equal [ -12.34, 45.67 ], checking.entries.order(:date).pluck(:amount).map(&:to_f)
+  end
+
+  test "re-applying the selection reuses the account it created" do
+    cpt = @import.sheet_tables.find { |t| t.name == CPT_SHEET }
+    @import.apply_sheet_selections!([ selection(cpt, "account_id" => "new", "account_name" => "Checking FR") ])
+
+    assert_no_difference -> { @family.accounts.count } do
+      @import.apply_sheet_selections!([ selection(cpt, "account_id" => "new", "account_name" => "Checking FR") ])
+    end
+  end
+
+  test "requires a date and an amount column" do
+    cpt = @import.sheet_tables.find { |t| t.name == CPT_SHEET }
+
+    assert_raises(XlsxImport::SelectionError) do
+      @import.apply_sheet_selections!([ selection(cpt, "account_id" => "new", "amount_col" => "") ])
+    end
   end
 
   test "skips rows whose name matches a family import exclusion" do
     @family.import_exclusions.create!(name: "interets 2025") # case-insensitive match
-    cpt = @import.detected_sheets.find { |s| s.type == :cpt }
+    cpt = @import.sheet_tables.find { |t| t.name == CPT_SHEET }
 
-    @import.apply_sheet_selections!([
-      { "sheet_name" => cpt.sheet_name, "selected" => "1", "account_id" => "new", "account_name" => "Checking FR" }
-    ])
+    @import.apply_sheet_selections!([ selection(cpt, "account_id" => "new") ])
 
-    assert_equal 1, @import.rows_count
-    assert_equal "PAIEMENT CB CARREFOUR", @import.rows.first.name
+    assert_equal [ "PAIEMENT CB CARREFOUR" ], @import.rows.pluck(:name)
   end
 
-  test "import flow hooks" do
-    assert_equal %i[date name amount currency], @import.column_keys
-    assert_empty @import.mapping_steps
-    assert_not @import.requires_csv_workflow?
+  # One sheet per bank-export layout, see generate_formats.py.
+  # sheet => [rows to skip, date header, label header, amount header, first imported row]
+  FORMATS = {
+    "a1_simple" => [ 0, "Date", "Description", "Amount", [ "2024-03-01", "Coffee shop", "-3.5" ] ],
+    "titles" => [ 4, "Date opération", "Libellé", "Montant", [ "2024-03-01", "PRLV EDF", "-80.12" ] ],
+    "offset" => [ 5, "Date", "Payee", "Amount", [ "2024-04-01", "Bakery", "-4.1" ] ],
+    "text_values" => [ 2, "Date", "Libellé", "Montant", [ "15/03/2024", "CARTE MONOPRIX", "-1234.56" ] ],
+    "paid_in_out" => [ 3, "Date", "Description", "Amount (credit - debit)", [ "2024-05-01", "COUNCIL TAX", "-120.0" ] ],
+    "key_values" => [ 4, "Booking date", "Text", "Amount", [ "2024-06-01", "Rent", "-900.0" ] ],
+    "german" => [ 2, "Buchungstag", "Verwendungszweck", "Amount (credit - debit)", [ "2024-07-01", "Miete Juli", "-750.0" ] ],
+    "totals_footer" => [ 0, "Date", "Label", "Amount", [ "2024-08-01", "Shop", "-10.0" ] ],
+    "amount_first" => [ 0, "Date", "Payee", "Amount", [ "2024-09-01", "Streaming", "-15.99" ] ],
+    "datetime" => [ 0, "Transaction date", "Merchant", "Amount", [ "2024-10-01", "Taxi", "-18.4" ] ],
+    "two_line_header" => [ 1, "Date", "Libellé", "Amount (credit - debit)", [ "2024-11-01", "LOYER", "-700.0" ] ],
+    "summary_block" => [ 3, "Date", "Libellé", "Montant", [ "2024-12-01", "ACHAT", "-20.0" ] ],
+    "spanish" => [ 1, "Fecha", "Concepto", "Importe", [ "2024-01-10", "Supermercado", "-35.1" ] ],
+    "unknown_amount_header" => [ 0, "Jour", "Opération", "Somme", [ "2024-02-01", "Boulangerie", "-2.3" ] ]
+  }.freeze
+
+  test "finds the table and its columns in many bank layouts" do
+    @import.xlsx_file.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/imports/bank_formats.xlsx")),
+      filename: "bank_formats.xlsx",
+      content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    @import.number_format = "1 234,56" # for the text_values sheet
+    tables = @import.sheet_tables.index_by(&:name)
+    account = OpenStruct.new(id: "account", currency: "EUR")
+
+    FORMATS.each do |sheet, (skip, date, name, amount, first_row)|
+      table = tables.fetch(sheet)
+      assert_equal skip, table.rows_to_skip, "#{sheet}: rows to skip"
+      assert_equal [ date, name, amount ], table.columns.values_at(:date, :name, :amount).map { |i| i && table.headers[i] }, "#{sheet}: columns"
+
+      imported = table.data.filter_map { |row| @import.send(:row_attributes, row, table.columns, account) }
+      assert_equal first_row, imported.first.values_at(:date, :name, :amount), "#{sheet}: first row"
+      assert_not imported.any? { |row| row[:date] == "Total" }, "#{sheet}: footer rows are skipped"
+    end
+
+    assert_not tables.fetch("notes_only").importable?
   end
+
+  test "guess_header_row finds the header after title rows in a text-only sheet" do
+    rows = [
+      [ "Bank statement" ],
+      [ "Account", "FR76 3000 4000" ], # label row directly above the real header
+      [],
+      [ "Date", "Description", "Amount" ],
+      [ "15/03/2024", "Coffee", "-3,50 €" ],
+      [ "16/03/2024", "Salary", "2 000,00" ]
+    ]
+
+    assert_equal 3, XlsxImport.guess_header_row(rows)
+  end
+
+  test "guess_header_row defaults to the first row" do
+    assert_equal 0, XlsxImport.guess_header_row([ [ "Date", "Amount" ], [ Date.new(2024, 1, 1), BigDecimal("1") ] ])
+    assert_equal 0, XlsxImport.guess_header_row([ [ "just a note" ] ])
+  end
+
+  private
+    def selection(table, overrides = {})
+      {
+        "sheet_name" => table.name,
+        "selected" => "1",
+        "rows_to_skip" => table.rows_to_skip.to_s,
+        "date_col" => table.columns[:date].to_s,
+        "name_col" => table.columns[:name].to_s,
+        "amount_col" => table.columns[:amount].to_s
+      }.merge(overrides)
+    end
 end

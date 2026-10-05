@@ -2,7 +2,9 @@
   <%= render "imports/nav", import: @import %>
 <% end %>
 
-<%= content_for :previous_path, import_upload_path(@import) %>
+<%= content_for :previous_path, imports_path %>
+
+<% select_class = "w-full rounded-lg border border-secondary bg-container px-3 py-2 text-sm text-primary" %>
 
 <div class="space-y-6 mx-auto max-w-3xl mb-6">
   <div class="text-center space-y-2 max-w-xl mx-auto">
@@ -10,86 +12,90 @@
     <p class="text-secondary text-sm"><%= t(".description") %></p>
   </div>
 
-  <% if @detected_sheets.empty? %>
-    <div class="flex gap-3 items-start rounded-xl border border-warning bg-warning/5 px-4 py-3">
-      <%= icon("triangle-alert", size: "md", class: "text-warning shrink-0 mt-0.5") %>
-      <div class="text-sm text-primary space-y-1">
-        <p class="font-medium"><%= t(".none_title") %></p>
-        <p class="text-secondary"><%= t(".none_description") %></p>
-      </div>
-    </div>
-
+  <% if @tables.empty? %>
+    <p class="text-sm text-secondary text-center"><%= t(".none") %></p>
     <%= render DS::Button.new(text: t(".back_to_imports"), href: imports_path, variant: :secondary, full_width: true) %>
   <% else %>
-    <%= form_with url: import_sheet_selection_path(@import), method: :put, class: "space-y-4" do |form| %>
+    <%= styled_form_with model: @import, scope: :import, url: import_sheet_selection_path(@import), method: :put, class: "space-y-4" do |form| %>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+        <%= form.select :date_format, Family::DATE_FORMATS + Import::CSV_ONLY_DATE_FORMATS, { label: t(".date_format_label") } %>
+        <%= form.select :number_format, Import::NUMBER_FORMATS.keys, { label: t(".number_format_label") } %>
+        <%= form.select :signage_convention,
+                        [ [ t(".incomes_are_positive"), "inflows_positive" ], [ t(".incomes_are_negative"), "inflows_negative" ] ],
+                        { label: t(".signage_label") } %>
+      </div>
+      <p class="text-xs text-secondary"><%= t(".formats_hint") %></p>
+
       <div class="bg-container-inset rounded-xl p-1 space-y-1">
-        <% @detected_sheets.each_with_index do |sheet, index| %>
-          <% suggested = @import.suggested_account_for(sheet) %>
+        <% @tables.each_with_index do |table, index| %>
           <% field = "import[sheets][#{index}]" %>
+          <% selection = @selections[table.name] || {} %>
+          <% checked = selection.any? ? selection["selected"] == "1" : table.importable? %>
+          <% column_options = table.headers.each_with_index.to_a %>
 
           <div class="bg-container shadow-border-xs rounded-lg p-4 space-y-3">
-            <input type="hidden" name="<%= field %>[sheet_name]" value="<%= sheet.sheet_name %>">
+            <input type="hidden" name="<%= field %>[sheet_name]" value="<%= table.name %>">
+            <input type="hidden" name="<%= field %>[selected]" value="0">
 
-            <div class="flex items-start gap-3">
-              <input
-                type="checkbox"
-                name="<%= field %>[selected]"
-                value="1"
-                id="sheet_<%= index %>"
-                <%= "checked" if suggested.present? || @import.detected_sheets.size <= 1 || sheet.type == :cpt %>
-                class="mt-1 rounded border-primary">
-
-              <label for="sheet_<%= index %>" class="flex-1 cursor-pointer">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-sm font-medium text-primary"><%= sheet.account_name %></span>
-                  <%= render DS::Pill.new(label: sheet.type.to_s.upcase, tone: (sheet.type == :cpt ? :info : :warning), marker: false, show_dot: false) %>
-                  <% if suggested.present? %>
-                    <%= render DS::Pill.new(label: t(".known_account"), tone: :success, marker: false, show_dot: false) %>
-                  <% end %>
-                </div>
-                <div class="text-xs text-secondary mt-0.5">
-                  <%= t(".account_number") %>: <span class="font-mono"><%= sheet.account_number %></span>
-                  &middot; <%= t(".transactions_count", count: sheet.row_count || 0) %>
-                  &middot; <%= sheet.currency %>
-                </div>
-              </label>
-            </div>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" name="<%= field %>[selected]" value="1" class="rounded border-primary" <%= "checked" if checked %>>
+              <span class="text-sm font-medium text-primary"><%= table.name %></span>
+              <span class="text-xs text-secondary"><%= t(".rows_count", count: table.data.size) %></span>
+            </label>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pl-7">
-              <select
-                name="<%= field %>[account_id]"
-                class="w-full rounded-lg border border-secondary bg-container px-3 py-2 text-sm text-primary">
-                <option value="new" <%= "selected" if suggested.blank? %>><%= t(".create_new_account") %></option>
+              <select name="<%= field %>[account_id]" aria-label="<%= t(".account_label") %>" class="<%= select_class %>">
+                <option value="new"><%= t(".create_new_account") %></option>
                 <% @accounts.each do |account| %>
-                  <option value="<%= account.id %>" <%= "selected" if suggested&.id == account.id %>>
-                    <%= account.name %>
-                  </option>
+                  <option value="<%= account.id %>" <%= "selected" if selection["account_id"] == account.id %>><%= account.name %></option>
                 <% end %>
               </select>
 
-              <input
-                type="text"
-                name="<%= field %>[account_name]"
-                value="<%= sheet.account_name %>"
-                placeholder="<%= t(".new_account_name_placeholder") %>"
-                class="w-full rounded-lg border border-secondary bg-container px-3 py-2 text-sm text-primary">
+              <input type="text" autocomplete="off" name="<%= field %>[account_name]" value="<%= selection["account_name"].presence || table.name %>"
+                     placeholder="<%= t(".new_account_name_placeholder") %>" aria-label="<%= t(".new_account_name_placeholder") %>" class="<%= select_class %>">
             </div>
 
-            <% if sheet.sample.any? %>
-              <div class="pl-7 text-xs text-secondary space-y-0.5">
-                <% sheet.sample.first(2).each do |txn| %>
-                  <div class="flex justify-between gap-2">
-                    <span class="truncate"><%= txn[:date] %> &middot; <%= txn[:name] %></span>
-                    <span class="font-mono shrink-0"><%= txn[:amount] %> <%= txn[:currency] %></span>
-                  </div>
-                <% end %>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pl-7">
+              <label class="text-xs text-secondary space-y-1">
+                <span><%= t(".rows_to_skip_label") %></span>
+                <input type="number" autocomplete="off" min="0" step="1" name="<%= field %>[rows_to_skip]" value="<%= table.rows_to_skip %>" class="<%= select_class %>">
+              </label>
+              <% { date: t(".date_col_label"), name: t(".name_col_label"), amount: t(".amount_col_label") }.each do |role, label| %>
+                <label class="text-xs text-secondary space-y-1">
+                  <span><%= label %></span>
+                  <select name="<%= field %>[<%= role %>_col]" class="<%= select_class %>">
+                    <option value=""><%= t(".no_column") %></option>
+                    <%= options_for_select(column_options, table.columns[role]) %>
+                  </select>
+                </label>
+              <% end %>
+            </div>
+
+            <% if table.data.any? %>
+              <div class="pl-7 overflow-x-auto">
+                <table class="text-xs text-secondary">
+                  <thead>
+                    <tr><% table.headers.each do |header| %><th class="text-left font-medium pr-3"><%= header %></th><% end %></tr>
+                  </thead>
+                  <tbody>
+                    <% table.sample.each do |row| %>
+                      <tr><% row.each do |cell| %><td class="pr-3 whitespace-nowrap"><%= cell %></td><% end %></tr>
+                    <% end %>
+                  </tbody>
+                </table>
               </div>
             <% end %>
           </div>
         <% end %>
       </div>
 
-      <%= render DS::Button.new(text: t(".import_selected"), type: :submit, full_width: true) %>
+      <div class="flex gap-2">
+        <button type="submit" formmethod="get" formaction="<%= import_sheet_selection_path(@import) %>" formnovalidate
+                class="shrink-0 rounded-lg border border-secondary px-3 py-2 text-sm text-primary">
+          <%= t(".refresh") %>
+        </button>
+        <%= render DS::Button.new(text: t(".import_selected"), type: :submit, full_width: true) %>
+      </div>
     <% end %>
   <% end %>
 </div>
