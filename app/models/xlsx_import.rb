@@ -1,14 +1,18 @@
 # Imports transactions from a multi-sheet Excel (.xlsx) bank export in one go,
-# whatever bank produced it. Each sheet is one account: on the selection step
-# the user ticks the sheets to import, maps each to an app account, and checks
-# the guessed table layout (title rows to skip, date/label/amount columns).
+# whatever bank produced it. Each table (usually one per sheet, sometimes
+# several stacked in one sheet) is one account: on the selection step the user
+# ticks the tables to import, maps each to an app account, and checks the
+# guessed layout (title rows to skip, date/label/amount/sign columns).
 #
 # Nothing is hardcoded per bank; the guesses are only defaults:
-#   - title rows above the table are detected (see .guess_header_row)
+#   - title rows above a table are detected (see .find_header), and a table
+#     ends where the next one's header starts
 #   - rows below the header that hold no value (sub-headers, notes) are dropped
-#   - split debit/credit columns get a computed signed amount column
-#   - the date column is the one holding dates, the label column the one with
-#     the most text, the amount column the computed one or a keyword match
+#   - split debit/credit columns get a computed signed amount column, and an
+#     unsigned amount with a "D"/"C" style column is signed from it
+#   - the date column is the one holding dates (typed, numeric text, or with a
+#     month name in any locale), the label column the one with the most text,
+#     the amount column the computed one or a keyword match
 class XlsxImport < Import
   has_one_attached :xlsx_file, dependent: :purge_later
 
@@ -28,13 +32,19 @@ class XlsxImport < Import
   VALUE_DATE_HEADER_RE = /\A(valeur|value|valuta|wertstellung|fecha valor|date de valeur|data valuta|data waluty|data valor|дата валют|ngay hieu luc|起息)/i
   BALANCE_HEADER_RE = /\A(solde|balance|saldo|kontostand|running|sold\b|bakiye|egyenleg|остат|баланс|залиш|so du|余额|餘額|結餘)/i
   TEXT_DATE_RE = %r{\A\d{1,4}[./-]\d{1,2}[./-]\d{1,4}\z}
+  CJK_DATE_RE = /\A(\d{4})\s*[年년]\s*(\d{1,2})\s*[月월]\s*(\d{1,2})/
+  # Values of a debit/credit indicator column, besides the header keywords.
+  DEBIT_SIGNS = %w[d dr db dbt dbit s - out].freeze
+  CREDIT_SIGNS = %w[c cr cdt crdt h + in].freeze
 
   # How many rows below a candidate header are inspected to confirm it.
   HEADER_LOOKAHEAD = 3
 
-  # One sheet read as a table. +data+ rows are arrays of typed cells aligned
-  # with +headers+; +columns+ holds the guessed { date:, name:, amount: } indexes.
-  SheetTable = Struct.new(:name, :rows_to_skip, :headers, :data, :columns, keyword_init: true) do
+  # One table of a sheet. +key+ identifies it on the selection form, +name+ is
+  # its sheet and +label+ what the user sees. +data+ rows are arrays of typed
+  # cells aligned with +headers+; +columns+ holds the guessed
+  # { date:, name:, amount:, sign: } indexes.
+  SheetTable = Struct.new(:key, :name, :label, :rows_to_skip, :headers, :data, :columns, keyword_init: true) do
     def importable?
       columns[:date].present? && columns[:amount].present?
     end
@@ -62,25 +72,35 @@ class XlsxImport < Import
       XLSX_EXTENSIONS.include?(File.extname(file.original_filename.to_s).downcase)
     end
 
-    # 0-based index of the table's header row in +rows+ (arrays of typed cells),
-    # i.e. the number of title rows to skip. The header is the first label row
-    # (2+ text cells, no values) that is directly followed by data, i.e. mostly
-    # rows holding at least a date and an amount. Falls back to 0.
-    # ponytail: heuristic; a wrong guess is fixed by the user on the selection step.
+    # 0-based index of the first table's header row in +rows+ (arrays of typed
+    # cells), i.e. the number of title rows to skip. Falls back to 0.
     def guess_header_row(rows)
-      rows.each_index.find do |index|
+      find_header(rows) || 0
+    end
+
+    # Index of the first header row at or after +from+, or nil. A header is a
+    # label row (2+ distinct text cells, no values) directly followed by data,
+    # i.e. mostly rows holding at least a date and an amount.
+    # ponytail: heuristic; a wrong guess is fixed by the user on the selection step.
+    def find_header(rows, from = 0)
+      (from...rows.size).find do |index|
         next false unless label_row?(rows[index])
 
         # Lone cells (sub-headers like "Card XXXX 1234", notes) say nothing either way.
         body = rows.drop(index + 1).reject { |row| distinct_cells(row).size < 2 }.first(HEADER_LOOKAHEAD)
-        # Another label row just below means this one is a title or summary
-        # block above the real header (e.g. "Account | Owner").
-        next false if body.empty? || body.any? { |row| label_row?(row) }
+        before_label = body.take_while { |row| !label_row?(row) }
+        hits = before_label.count { |row| row.count { |cell| value_cell?(cell) } >= 2 }
 
-        # At least half look like transactions (a date and an amount); the rest
-        # may be a totals footer.
-        body.count { |row| row.count { |cell| value_cell?(cell) } >= 2 } * 2 >= body.size
-      end || 0
+        if before_label.size < body.size
+          # Another label row follows: either this row is a title or summary
+          # block above the real header ("Account | Owner"), or a second table
+          # starts after a short first one.
+          hits >= 2
+        else
+          # At least half look like transactions; the rest may be a totals footer.
+          body.any? && hits * 2 >= body.size
+        end
+      end
     end
 
     def label_row?(row)
@@ -95,12 +115,61 @@ class XlsxImport < Import
     end
 
     # A date or a number, typed or written as text ("15/03/2024", "-1 234,56 €",
-    # "12.50 EUR").
+    # "12.50 EUR", "5 janv. 2024").
     def value_cell?(cell)
       case cell
       when Date, Numeric then true
-      else cell.to_s.gsub(/\p{Sc}|\p{Space}|\A[A-Z]{3}|[A-Z]{3}\z/, "").match?(/\A[-+]?\d[\d.,\/:'-]*\z/)
+      else
+        cell.to_s.gsub(/\p{Sc}|\p{Space}|\A[A-Z]{3}|[A-Z]{3}\z/, "").match?(/\A[-+]?\d[\d.,\/:'-]*\z/) ||
+          text_date(cell).present?
       end
+    end
+
+    # Date written with a month name in any available locale ("5 janv. 2024",
+    # "Jan 5, 2024", "5 de enero de 2024", "5. März 2024") or in CJK form
+    # ("2024年1月5日"); nil otherwise. Numeric text dates ("05/01/2024") are
+    # left to the import's date format, which only the user knows.
+    def text_date(cell)
+      text = cell.to_s.strip
+      return nil if text.empty? || text.length > 40 || !text.match?(/\d/)
+
+      if (cjk = text.match(CJK_DATE_RE))
+        return Date.new(*cjk.captures.map(&:to_i))
+      end
+
+      words = text.scan(/\p{L}+/)
+      months = words.filter_map { |word| month_numbers[month_key(word)] }
+      # Other words may only be short glue ("de", "of").
+      return nil unless months.one? && words.all? { |word| month_numbers[month_key(word)] || word.length <= 2 }
+
+      numbers = text.scan(/\d+/)
+      year = numbers.find { |n| n.length == 4 } || (numbers.last if numbers.size >= 2 && numbers.last.length == 2)
+      return nil unless year
+
+      rest = numbers.dup
+      rest.delete_at(rest.index(year))
+      return nil if rest.empty?
+
+      Date.new(year.length == 2 ? 2000 + year.to_i : year.to_i, months.first, rest.first.to_i)
+    rescue Date::Error, ArgumentError
+      nil
+    end
+
+    # Month name or abbreviation (accent/case/dot-insensitive) => 1..12, from
+    # every locale's date.month_names / date.abbr_month_names.
+    def month_numbers
+      @month_numbers ||= [ I18n.default_locale, *I18n.available_locales ].uniq.each_with_object({}) do |locale, map|
+        %w[date.month_names date.abbr_month_names].each do |key|
+          names = I18n.t(key, locale: locale, default: nil)
+          next unless names.is_a?(Array)
+
+          names.each_with_index { |name, month| map[month_key(name)] ||= month if name.present? && month.between?(1, 12) }
+        end
+      end
+    end
+
+    def month_key(word)
+      word.to_s.unicode_normalize(:nfkd).gsub(/\p{Mn}/, "").downcase.delete(".")
     end
   end
 
@@ -110,33 +179,40 @@ class XlsxImport < Import
     @workbook ||= Import::XlsxWorkbook.open(xlsx_file.download)
   end
 
-  # rows_to_skip: { sheet_name => Integer } overrides for the guessed header.
+  # Every table of every visible sheet. rows_to_skip: { table key => Integer }
+  # overrides for a table's guessed header.
   def sheet_tables(rows_to_skip: {})
-    workbook.visible_sheets.filter_map { |sheet| sheet_table(sheet.name, rows_to_skip[sheet.name]) }
+    workbook.visible_sheets.select(&:path).flat_map do |sheet|
+      rows = workbook.rows(sheet.name)
+      starts = header_rows(rows)
+
+      starts.each_with_index.map do |start, position|
+        key = "#{sheet.name}|#{position}"
+        table = build_table(sheet.name, rows, rows_to_skip[key].presence&.to_i || start)
+        title = table_title(rows, table.rows_to_skip) if starts.many?
+        table.key = key
+        table.label = starts.many? ? "#{sheet.name} · #{title || position + 1}" : sheet.name
+        table
+      end
+    end
   end
 
+  # The table of +sheet_name+ whose header is +rows_to_skip+ (or the first one).
   def sheet_table(sheet_name, rows_to_skip = nil)
     sheet = workbook.visible_sheets.find { |s| s.name == sheet_name && s.path }
     return nil unless sheet
 
-    table = workbook.rows(sheet.name)
-    return nil if table.empty?
+    rows = workbook.rows(sheet.name)
+    return nil if rows.empty?
 
-    skip = rows_to_skip.present? ? rows_to_skip.to_i.clamp(0, table.size - 1) : self.class.guess_header_row(table)
-    header = table[skip]
-    data = table.drop(skip + 1).select { |row| row.any? { |cell| self.class.value_cell?(cell) } }
-    header, data = add_amount_from_debit_credit(header, data)
-
-    width = [ header.size, *data.map(&:size) ].max
-    headers = Array.new(width) { |i| header[i].to_s.strip.presence || I18n.t("imports.xlsx.column", number: i + 1) }
-
-    SheetTable.new(name: sheet.name, rows_to_skip: skip, headers: headers, data: data, columns: guess_columns(headers, data))
+    build_table(sheet.name, rows, rows_to_skip.present? ? rows_to_skip.to_i : self.class.guess_header_row(rows))
   end
 
   # --- Selection step -------------------------------------------------------
 
   # selections: array of { "sheet_name", "selected", "account_id" ("new" or an
-  # id), "account_name", "rows_to_skip", "date_col", "name_col", "amount_col" }.
+  # id), "account_name", "rows_to_skip", "date_col", "name_col", "amount_col",
+  # "sign_col" }.
   def apply_sheet_selections!(selections)
     chosen = Array(selections).select { |s| ActiveModel::Type::Boolean.new.cast(s["selected"]) }
 
@@ -145,7 +221,7 @@ class XlsxImport < Import
         table = sheet_table(selection["sheet_name"].to_s, selection["rows_to_skip"])
         raise SelectionError, I18n.t("imports.xlsx.unknown_sheet", sheet: selection["sheet_name"]) unless table
 
-        columns = %w[date name amount].to_h { |key| [ key.to_sym, selection["#{key}_col"].presence&.to_i ] }
+        columns = %w[date name amount sign].to_h { |key| [ key.to_sym, selection["#{key}_col"].presence&.to_i ] }
         raise SelectionError, I18n.t("imports.xlsx.missing_columns", sheet: table.name) unless columns[:date] && columns[:amount]
 
         account = resolve_account(selection, table)
@@ -272,26 +348,79 @@ class XlsxImport < Import
       )
     end
 
+    def build_table(sheet_name, rows, skip)
+      skip = skip.clamp(0, rows.size - 1)
+      stop = self.class.find_header(rows, skip + 1) || rows.size # next table's header
+      header = rows[skip]
+      data = rows[(skip + 1)...stop].select { |row| row.any? { |cell| self.class.value_cell?(cell) } }
+      header, data = add_amount_from_debit_credit(header, data)
+
+      width = [ header.size, *data.map(&:size) ].max
+      headers = Array.new(width) { |i| header[i].to_s.strip.presence || I18n.t("imports.xlsx.column", number: i + 1) }
+
+      SheetTable.new(name: sheet_name, label: sheet_name, rows_to_skip: skip, headers: headers, data: data, columns: guess_columns(headers, data))
+    end
+
+    # Header row indexes of the tables stacked in a sheet.
+    def header_rows(rows)
+      return [] if rows.empty?
+
+      starts = [ self.class.guess_header_row(rows) ]
+      while (next_start = self.class.find_header(rows, starts.last + 1))
+        starts << next_start
+      end
+      starts
+    end
+
+    # A lone title right above a table's header ("Savings account"), if any.
+    def table_title(rows, header_index)
+      rows[[ header_index - 3, 0 ].max...header_index].reverse_each do |row|
+        cells = self.class.distinct_cells(row)
+        return cells.first.to_s.strip if cells.one? && !self.class.value_cell?(cells.first)
+      end
+      nil
+    end
+
     # nil for rows that aren't transactions: no date (totals, notes) or a zero
     # amount (informational lines such as rate changes).
     def row_attributes(row, columns, account)
       date = row[columns[:date]]
+      date = self.class.text_date(date) || date unless date.is_a?(Date)
       amount = row[columns[:amount]]
-      return nil unless date_cell?(date)
+      return nil unless date.is_a?(Date) || date.to_s.match?(/\d/)
       return nil if amount.is_a?(Numeric) && amount.zero?
 
+      amount = amount.is_a?(Numeric) ? amount.to_d.to_s("F") : sanitize_number(amount)
       {
         import_id: id,
         account: account.id, # resolved at import! time
         date: date.is_a?(Date) ? date.strftime(date_format) : date.to_s.strip,
         name: (columns[:name] && row[columns[:name]]).to_s.strip.presence || default_row_name,
-        amount: amount.is_a?(Numeric) ? amount.to_d.to_s("F") : sanitize_number(amount),
+        amount: columns[:sign] ? signed_by_indicator(amount, row[columns[:sign]]) : amount,
         currency: account.currency.presence || family.currency
       }
     end
 
+    def signed_by_indicator(amount, indicator)
+      return amount if amount.blank?
+
+      case sign_of(indicator)
+      when :debit then "-#{amount.delete_prefix("-")}"
+      when :credit then amount.delete_prefix("-")
+      else amount
+      end
+    end
+
+    # :debit / :credit for an indicator cell ("D", "CR", "Débit", "+"), else nil.
+    def sign_of(cell)
+      text = plain_text(cell).downcase
+      return :debit if DEBIT_SIGNS.include?(text) || text.match?(DEBIT_HEADER_RE)
+
+      :credit if CREDIT_SIGNS.include?(text) || text.match?(CREDIT_HEADER_RE)
+    end
+
     def date_cell?(cell)
-      cell.is_a?(Date) || cell.to_s.strip.match?(TEXT_DATE_RE)
+      cell.is_a?(Date) || cell.to_s.strip.match?(TEXT_DATE_RE) || self.class.text_date(cell).present?
     end
 
     def guess_columns(headers, data)
@@ -307,7 +436,21 @@ class XlsxImport < Import
           cell.is_a?(String) && !self.class.value_cell?(cell) ? cell.length : 0
         end
 
-      { date: date, name: name, amount: amount }
+      { date: date, name: name, amount: amount, sign: sign_column(data, date, amount, except: [ date, name, amount ]) }
+    end
+
+    # A debit/credit indicator column, when the amounts themselves are unsigned.
+    def sign_column(data, date, amount, except:)
+      return nil if date.nil?
+
+      sample = data.select { |row| date_cell?(row[date]) }.first(50) # skip totals and notes
+      return nil if amount.nil? || sample.any? { |row| row[amount].is_a?(Numeric) ? row[amount].negative? : row[amount].to_s.strip.start_with?("-") }
+
+      width = sample.map(&:size).max.to_i
+      (0...width).reject { |i| except.include?(i) }.find do |i|
+        values = sample.map { |row| row[i] }.reject(&:blank?)
+        values.any? && values.all? { |value| sign_of(value) }
+      end
     end
 
     def header_indexes(headers, pattern)

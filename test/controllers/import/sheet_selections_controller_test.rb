@@ -1,6 +1,8 @@
 require "test_helper"
 
 class Import::SheetSelectionsControllerTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
   setup do
     sign_in @user = users(:family_admin)
     @import = @user.family.imports.create!(type: "XlsxImport", date_format: "%Y-%m-%d")
@@ -25,6 +27,42 @@ class Import::SheetSelectionsControllerTest < ActionDispatch::IntegrationTest
       assert_response :success, locale
       assert_select "h1", I18n.t("import.sheet_selections.show.title", locale: locale)
     end
+  end
+
+  test "imports an uploaded workbook end to end" do
+    post imports_url, params: { import: { type: "XlsxImport", import_file: fixture_file_upload("imports/bank_formats.xlsx") } }
+    import = @user.family.imports.where(type: "XlsxImport").order(:created_at).last
+    assert_redirected_to import_sheet_selection_url(import)
+
+    get import_sheet_selection_url(import)
+    assert_response :success
+
+    # The second of two accounts stacked in one sheet.
+    table = import.sheet_tables.find { |t| t.key == "stacked_tables|1" }
+    put import_sheet_selection_url(import), params: {
+      import: {
+        date_format: "%Y-%m-%d",
+        number_format: "1,234.56",
+        signage_convention: "inflows_positive",
+        sheets: {
+          "0" => {
+            table_key: table.key, sheet_name: table.name, selected: "1", account_id: "new", account_name: "Livret A",
+            rows_to_skip: table.rows_to_skip, date_col: table.columns[:date], name_col: table.columns[:name], amount_col: table.columns[:amount]
+          }
+        }
+      }
+    }
+    assert_redirected_to import_clean_url(import)
+
+    get import_clean_url(import)
+    assert_response :success
+
+    perform_enqueued_jobs { post publish_import_url(import) }
+
+    assert import.reload.complete?, import.error
+    account = @user.family.accounts.find_by!(name: "Livret A")
+    assert_equal [ [ Date.new(2024, 2, 1), "Intérêts", -12.5 ], [ Date.new(2024, 3, 1), "Versement", -100.0 ] ],
+                 account.entries.order(:date).map { |e| [ e.date, e.name, e.amount.to_f ] }
   end
 
   test "update imports the selected sheets" do

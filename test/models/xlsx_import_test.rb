@@ -24,11 +24,11 @@ class XlsxImportTest < ActiveSupport::TestCase
     cpt = tables[CPT_SHEET]
     assert_equal 4, cpt.rows_to_skip
     assert_equal "Amount (credit - debit)", cpt.headers.last
-    assert_equal({ date: 0, name: 2, amount: 7 }, cpt.columns)
+    assert_equal({ date: 0, name: 2, amount: 7, sign: nil }, cpt.columns)
     assert cpt.importable?
 
     cb = tables[CB_SHEET]
-    assert_equal({ date: 0, name: 1, amount: 2 }, cb.columns)
+    assert_equal({ date: 0, name: 1, amount: 2, sign: nil }, cb.columns)
     assert_equal 3, cb.data.size # the "Carte Mastercard" sub-header line is dropped
 
     assert_not tables["Vos comptes"].importable? # summary sheet has no dates
@@ -96,7 +96,9 @@ class XlsxImportTest < ActiveSupport::TestCase
     "polish" => [ 2, "Data operacji", "Opis", "Amount (credit - debit)", [ "2024-03-04", "Biedronka", "-45.2" ] ],
     "russian" => [ 1, "Дата", "Описание", "Сумма", [ "2024-04-01", "Пятёрочка", "-1250.5" ] ],
     "turkish" => [ 2, "İşlem tarihi", "Açıklama", "Tutar", [ "2024-05-02", "Market alışverişi", "-320.75" ] ],
-    "chinese" => [ 1, "交易日期", "摘要", "Amount (credit - debit)", [ "2024-06-01", "超市购物", "-88.5" ] ]
+    "chinese" => [ 1, "交易日期", "摘要", "Amount (credit - debit)", [ "2024-06-01", "超市购物", "-88.5" ] ],
+    "dc_indicator" => [ 0, "Date", "Description", "Amount", [ "2024-07-05", "Bakery", "-4.2" ] ],
+    "month_names" => [ 0, "Date", "Libellé", "Montant", [ "2024-01-05", "Boulangerie", "-4.2" ] ]
   }.freeze
 
   test "finds the table and its columns in many bank layouts" do
@@ -120,6 +122,29 @@ class XlsxImportTest < ActiveSupport::TestCase
     end
 
     assert_not tables.fetch("notes_only").importable?
+  end
+
+  test "signs unsigned amounts from a debit/credit column" do
+    table = bank_formats_tables.find { |t| t.name == "dc_indicator" }
+    assert_equal "D/C", table.headers[table.columns[:sign]]
+
+    amounts = table.data.map { |row| @import.send(:row_attributes, row, table.columns, OpenStruct.new(id: "a", currency: "EUR"))[:amount] }
+    assert_equal [ "-4.2", "2100.0" ], amounts
+  end
+
+  test "reads dates written with month names in any locale" do
+    table = bank_formats_tables.find { |t| t.name == "month_names" }
+    dates = table.data.map { |row| @import.send(:row_attributes, row, table.columns, OpenStruct.new(id: "a", currency: "EUR"))[:date] }
+
+    assert_equal %w[2024-01-05 2024-02-06 2024-03-07 2024-04-08 2024-05-09], dates
+  end
+
+  test "splits accounts stacked in one sheet into separate tables" do
+    tables = bank_formats_tables.select { |t| t.name == "stacked_tables" }
+
+    assert_equal [ "stacked_tables · Compte courant", "stacked_tables · Livret A" ], tables.map(&:label)
+    assert_equal [ 2, 2 ], tables.map { |t| t.data.size }
+    assert_equal tables.last.rows_to_skip, @import.sheet_table("stacked_tables", tables.last.rows_to_skip.to_s).rows_to_skip
   end
 
   test "every supported locale translates the Excel import" do
@@ -149,6 +174,11 @@ class XlsxImportTest < ActiveSupport::TestCase
   end
 
   private
+    def bank_formats_tables
+      @import.xlsx_file.attach(io: File.open(Rails.root.join("test/fixtures/files/imports/bank_formats.xlsx")), filename: "bank_formats.xlsx")
+      @import.sheet_tables
+    end
+
     # Leaf keys of a locale file, plural forms collapsed (their categories
     # differ per language).
     def locale_keys(locale)

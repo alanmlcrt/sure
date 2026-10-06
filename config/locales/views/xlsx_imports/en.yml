@@ -25,6 +25,7 @@ en:
         date_col_label: "Date column"
         name_col_label: "Label column"
         amount_col_label: "Amount column"
+        sign_col_label: "Debit/credit column"
         refresh: "Refresh"
         import_selected: "Import selected sheets"
         no_column: "—"

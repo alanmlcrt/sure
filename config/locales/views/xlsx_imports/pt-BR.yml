@@ -25,6 +25,7 @@ pt-BR:
         date_col_label: "Coluna de data"
         name_col_label: "Coluna de descrição"
         amount_col_label: "Coluna de valor"
+        sign_col_label: "Coluna débito/crédito"
         refresh: "Atualizar"
         import_selected: "Importar planilhas selecionadas"
         no_column: "—"

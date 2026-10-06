@@ -25,6 +25,7 @@ hu:
         date_col_label: "Dátum oszlop"
         name_col_label: "Leírás oszlop"
         amount_col_label: "Összeg oszlop"
+        sign_col_label: "Terhelés/jóváírás oszlop"
         refresh: "Frissítés"
         import_selected: "Kijelölt munkalapok importálása"
         no_column: "—"

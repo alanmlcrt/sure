@@ -29,17 +29,18 @@
       <div class="bg-container-inset rounded-xl p-1 space-y-1">
         <% @tables.each_with_index do |table, index| %>
           <% field = "import[sheets][#{index}]" %>
-          <% selection = @selections[table.name] || {} %>
+          <% selection = @selections[table.key] || {} %>
           <% checked = selection.any? ? selection["selected"] == "1" : table.importable? %>
           <% column_options = table.headers.each_with_index.to_a %>
 
           <div class="bg-container shadow-border-xs rounded-lg p-4 space-y-3">
+            <input type="hidden" name="<%= field %>[table_key]" value="<%= table.key %>">
             <input type="hidden" name="<%= field %>[sheet_name]" value="<%= table.name %>">
             <input type="hidden" name="<%= field %>[selected]" value="0">
 
             <label class="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" name="<%= field %>[selected]" value="1" class="rounded border-primary" <%= "checked" if checked %>>
-              <span class="text-sm font-medium text-primary"><%= table.name %></span>
+              <span class="text-sm font-medium text-primary"><%= table.label %></span>
               <span class="text-xs text-secondary"><%= t(".rows_count", count: table.data.size) %></span>
             </label>
 
@@ -51,16 +52,16 @@
                 <% end %>
               </select>
 
-              <input type="text" autocomplete="off" name="<%= field %>[account_name]" value="<%= selection["account_name"].presence || table.name %>"
+              <input type="text" autocomplete="off" name="<%= field %>[account_name]" value="<%= selection["account_name"].presence || table.label %>"
                      placeholder="<%= t(".new_account_name_placeholder") %>" aria-label="<%= t(".new_account_name_placeholder") %>" class="<%= select_class %>">
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pl-7">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-2 pl-7">
               <label class="text-xs text-secondary space-y-1">
                 <span><%= t(".rows_to_skip_label") %></span>
                 <input type="number" autocomplete="off" min="0" step="1" name="<%= field %>[rows_to_skip]" value="<%= table.rows_to_skip %>" class="<%= select_class %>">
               </label>
-              <% { date: t(".date_col_label"), name: t(".name_col_label"), amount: t(".amount_col_label") }.each do |role, label| %>
+              <% { date: t(".date_col_label"), name: t(".name_col_label"), amount: t(".amount_col_label"), sign: t(".sign_col_label") }.each do |role, label| %>
                 <label class="text-xs text-secondary space-y-1">
                   <span><%= label %></span>
                   <select name="<%= field %>[<%= role %>_col]" class="<%= select_class %>">

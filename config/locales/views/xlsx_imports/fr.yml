@@ -25,6 +25,7 @@ fr:
         date_col_label: "Colonne date"
         name_col_label: "Colonne libellé"
         amount_col_label: "Colonne montant"
+        sign_col_label: "Colonne sens (débit/crédit)"
         refresh: "Actualiser"
         import_selected: "Importer les feuilles sélectionnées"
         no_column: "—"

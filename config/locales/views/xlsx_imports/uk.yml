@@ -27,6 +27,7 @@ uk:
         date_col_label: "Стовпець дати"
         name_col_label: "Стовпець опису"
         amount_col_label: "Стовпець суми"
+        sign_col_label: "Стовпець дебет/кредит"
         refresh: "Оновити"
         import_selected: "Імпортувати вибрані аркуші"
         no_column: "—"

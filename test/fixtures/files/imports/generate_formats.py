@@ -183,12 +183,54 @@ put(wb.create_sheet("chinese"), 1, 1, [
     [D(2024, 6, 2), "工资", None, 8000.0, 8911.5],
 ])
 
-# 20. Notes only, no table.
+# 20. Unsigned amounts with a debit/credit indicator column.
+put(wb.create_sheet("dc_indicator"), 1, 1, [
+    ["Date", "Description", "Amount", "D/C"],
+    [D(2024, 7, 5), "Bakery", 4.2, "D"],
+    [D(2024, 7, 6), "Salary", 2100.0, "C"],
+])
+
+# 21. Dates written as text with month names, in several languages.
+put(wb.create_sheet("month_names"), 1, 1, [
+    ["Date", "Libellé", "Montant"],
+    ["5 janv. 2024", "Boulangerie", -4.2],
+    ["Feb 6, 2024", "Salary", 2100.0],
+    ["7 de marzo de 2024", "Supermercado", -35.1],
+    ["8. April 2024", "Miete", -750.0],
+    ["2024年5月9日", "工资", 8000.0],
+])
+
+# 22. Two accounts stacked in one sheet, each with its own title and header.
+put(wb.create_sheet("stacked_tables"), 1, 1, [
+    ["Compte courant"],
+    ["Date", "Libellé", "Montant"],
+    [D(2024, 1, 5), "Boulangerie", -4.2],
+    [D(2024, 1, 6), "Salaire", 2100.0],
+    [],
+    ["Livret A"],
+    ["Date", "Libellé", "Montant"],
+    [D(2024, 2, 1), "Intérêts", 12.5],
+    [D(2024, 3, 1), "Versement", 100.0],
+])
+
+# 23. Notes only, no table.
 put(wb.create_sheet("notes_only"), 1, 1, [
     ["Ce fichier a été généré automatiquement."],
     ["Aucune opération sur la période."],
 ])
 
 out = "test/fixtures/files/imports/bank_formats.xlsx"
+wb.save(out)
+print("wrote", out)
+
+# Workbook saved with the 1904 date system (old Mac Excel).
+from openpyxl.utils.datetime import CALENDAR_MAC_1904
+
+wb = Workbook()
+wb.epoch = CALENDAR_MAC_1904
+ws = wb.active
+ws.title = "Compte"
+put(ws, 1, 1, [["Date", "Libellé", "Montant"], [D(2024, 1, 5), "Boulangerie", -4.2]])
+out = "test/fixtures/files/imports/date1904.xlsx"
 wb.save(out)
 print("wrote", out)

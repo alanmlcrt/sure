@@ -25,6 +25,7 @@ es:
         date_col_label: "Columna de fecha"
         name_col_label: "Columna de concepto"
         amount_col_label: "Columna de importe"
+        sign_col_label: "Columna cargo/abono"
         refresh: "Actualizar"
         import_selected: "Importar las hojas seleccionadas"
         no_column: "—"
