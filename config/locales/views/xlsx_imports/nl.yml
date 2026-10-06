@@ -25,6 +25,7 @@ nl:
         date_col_label: "Datumkolom"
         name_col_label: "Omschrijvingskolom"
         amount_col_label: "Bedragkolom"
+        sign_col_label: "Af/bij-kolom"
         refresh: "Vernieuwen"
         import_selected: "Geselecteerde werkbladen importeren"
         no_column: "—"

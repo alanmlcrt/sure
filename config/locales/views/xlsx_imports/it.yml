@@ -25,6 +25,7 @@ it:
         date_col_label: "Colonna data"
         name_col_label: "Colonna descrizione"
         amount_col_label: "Colonna importo"
+        sign_col_label: "Colonna dare/avere"
         refresh: "Aggiorna"
         import_selected: "Importa i fogli selezionati"
         no_column: "—"

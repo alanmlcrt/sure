@@ -38,6 +38,12 @@ class Import::XlsxWorkbookTest < ActiveSupport::TestCase
     assert_equal BigDecimal("-45.67"), matrix[7][4]
   end
 
+  test "reads dates from workbooks saved with the 1904 date system" do
+    workbook = Import::XlsxWorkbook.open(File.binread(Rails.root.join("test/fixtures/files/imports/date1904.xlsx")))
+
+    assert_equal Date.new(2024, 1, 5), workbook.cell_matrix("Compte")[2][1]
+  end
+
   test "excel_serial_to_date converts serials to dates" do
     assert_equal Date.new(2024, 12, 31), Import::XlsxWorkbook.excel_serial_to_date(45657)
     assert_nil Import::XlsxWorkbook.excel_serial_to_date(nil)

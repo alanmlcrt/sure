@@ -34,6 +34,8 @@ class Import::XlsxWorkbook
   # Excel's day 0 is 1899-12-31, but the 1900 leap-year bug means treating
   # 1899-12-30 as the epoch yields correct dates for all serials >= 60.
   EXCEL_EPOCH = Date.new(1899, 12, 30)
+  # Workbooks saved with the 1904 date system (old Mac Excel) count from here.
+  EXCEL_1904_EPOCH = Date.new(1904, 1, 1)
 
   # Built-in numFmtIds that render as dates (incl. the CJK locale variants).
   BUILTIN_DATE_FORMAT_IDS = [ 14..22, 27..36, 45..47, 50..58 ].flat_map(&:to_a).to_set.freeze
@@ -44,11 +46,11 @@ class Import::XlsxWorkbook
     end
 
     # Converts an Excel date serial (e.g. 45657) to a Ruby Date (2024-12-31).
-    def excel_serial_to_date(serial)
+    def excel_serial_to_date(serial, date1904: false)
       return nil if serial.nil?
 
       number = serial.is_a?(String) ? Float(serial) : serial.to_f
-      EXCEL_EPOCH + number.floor
+      (date1904 ? EXCEL_1904_EPOCH : EXCEL_EPOCH) + number.floor
     rescue ArgumentError, TypeError
       nil
     end
@@ -67,7 +69,7 @@ class Import::XlsxWorkbook
   # Sheets in workbook (tab) order.
   def sheets
     @sheets ||= begin
-      doc = parse_xml(read_entry("xl/workbook.xml"))
+      doc = workbook_doc
       rels = workbook_relationships
 
       doc.xpath("//ss:sheets/ss:sheet", NS).map do |node|
@@ -173,13 +175,23 @@ class Import::XlsxWorkbook
         return nil if raw.blank?
 
         if date_style_ids.include?(cell_node["s"].to_i)
-          self.class.excel_serial_to_date(raw)
+          self.class.excel_serial_to_date(raw, date1904: date1904?)
         else
           BigDecimal(raw)
         end
       end
     rescue ArgumentError
       raw
+    end
+
+    def workbook_doc
+      @workbook_doc ||= parse_xml(read_entry("xl/workbook.xml"))
+    end
+
+    def date1904?
+      return @date1904 if defined?(@date1904)
+
+      @date1904 = %w[1 true].include?(workbook_doc.at_xpath("//ss:workbookPr", NS)&.[]("date1904").to_s)
     end
 
     # Indexes into cellXfs whose number format displays a date.

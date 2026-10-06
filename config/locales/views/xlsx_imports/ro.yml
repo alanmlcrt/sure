@@ -26,6 +26,7 @@ ro:
         date_col_label: "Coloana dată"
         name_col_label: "Coloana descriere"
         amount_col_label: "Coloana sumă"
+        sign_col_label: "Coloana debit/credit"
         refresh: "Reîmprospătează"
         import_selected: "Importă foile selectate"
         no_column: "—"

@@ -25,6 +25,7 @@ nb:
         date_col_label: "Datokolonne"
         name_col_label: "Beskrivelseskolonne"
         amount_col_label: "Beløpskolonne"
+        sign_col_label: "Inn/ut-kolonne"
         refresh: "Oppdater"
         import_selected: "Importer valgte ark"
         no_column: "—"

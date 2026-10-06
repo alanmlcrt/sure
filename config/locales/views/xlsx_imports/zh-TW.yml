@@ -25,6 +25,7 @@ zh-TW:
         date_col_label: "日期欄"
         name_col_label: "描述欄"
         amount_col_label: "金額欄"
+        sign_col_label: "借貸方向欄"
         refresh: "重新整理"
         import_selected: "匯入所選工作表"
         no_column: "—"

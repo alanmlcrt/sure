@@ -10,7 +10,7 @@ class Import::SheetSelectionsController < ApplicationController
     redirect_to new_import_path, alert: t(".finalize_upload") and return unless @import.uploaded?
 
     @import.assign_attributes(format_params) # keep the formats picked before a refresh
-    @selections = sheet_selection_params.index_by { |s| s["sheet_name"] }
+    @selections = sheet_selection_params.index_by { |s| s["table_key"] }
     @tables = @import.sheet_tables(rows_to_skip: @selections.transform_values { |s| s["rows_to_skip"] })
     @accounts = accessible_accounts.visible.alphabetically
   rescue Import::XlsxWorkbook::Error => e
@@ -47,7 +47,7 @@ class Import::SheetSelectionsController < ApplicationController
     def sheet_selection_params
       sheets = params.dig(:import, :sheets) || {}
       sheets.values.map do |sheet|
-        sheet.permit(:sheet_name, :selected, :account_id, :account_name, :rows_to_skip, :date_col, :name_col, :amount_col).to_h
+        sheet.permit(:table_key, :sheet_name, :selected, :account_id, :account_name, :rows_to_skip, :date_col, :name_col, :amount_col, :sign_col).to_h
       end
     end
 end
