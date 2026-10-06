@@ -1,3 +1,5 @@
+require "zip"
+
 # Minimal, dependency-light reader for .xlsx workbooks.
 #
 # An .xlsx file is a zip of XML parts. We only depend on rubyzip + nokogiri
