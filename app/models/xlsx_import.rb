@@ -71,7 +71,7 @@ class XlsxImport < Import
         next false unless label_row?(rows[index])
 
         # Lone cells (sub-headers like "Card XXXX 1234", notes) say nothing either way.
-        body = rows.drop(index + 1).reject { |row| row.count(&:present?) < 2 }.first(HEADER_LOOKAHEAD)
+        body = rows.drop(index + 1).reject { |row| distinct_cells(row).size < 2 }.first(HEADER_LOOKAHEAD)
         # Another label row just below means this one is a title or summary
         # block above the real header (e.g. "Account | Owner").
         next false if body.empty? || body.any? { |row| label_row?(row) }
@@ -83,8 +83,14 @@ class XlsxImport < Import
     end
 
     def label_row?(row)
-      labels = row.reject(&:blank?)
+      labels = distinct_cells(row)
       labels.size >= 2 && labels.none? { |cell| value_cell?(cell) }
+    end
+
+    # Merged cells (titles, banners spanning the table) repeat one value in
+    # every cell they cover, so they count once.
+    def distinct_cells(row)
+      row.reject(&:blank?).uniq
     end
 
     # A date or a number, typed or written as text ("15/03/2024", "-1 234,56 €",

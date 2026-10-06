@@ -91,7 +91,8 @@ class XlsxImportTest < ActiveSupport::TestCase
     "two_line_header" => [ 1, "Date", "Libellé", "Amount (credit - debit)", [ "2024-11-01", "LOYER", "-700.0" ] ],
     "summary_block" => [ 3, "Date", "Libellé", "Montant", [ "2024-12-01", "ACHAT", "-20.0" ] ],
     "spanish" => [ 1, "Fecha", "Concepto", "Importe", [ "2024-01-10", "Supermercado", "-35.1" ] ],
-    "unknown_amount_header" => [ 0, "Jour", "Opération", "Somme", [ "2024-02-01", "Boulangerie", "-2.3" ] ]
+    "unknown_amount_header" => [ 0, "Jour", "Opération", "Somme", [ "2024-02-01", "Boulangerie", "-2.3" ] ],
+    "merged_banners" => [ 4, "Date", "Libellé", "Montant", [ "2026-08-18", "OPENAI CHATGPT", "-23.0" ] ]
   }.freeze
 
   test "finds the table and its columns in many bank layouts" do
