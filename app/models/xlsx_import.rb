@@ -17,15 +17,16 @@ class XlsxImport < Import
   MAX_XLSX_SIZE = 15.megabytes
   XLSX_EXTENSIONS = %w[.xlsx].freeze
 
-  # ponytail: keyword match on the accent-stripped header, covers the usual
-  # EN/FR/DE/ES/IT/NL wordings; extend when an export isn't recognised (the
+  # ponytail: keyword match on the accent-stripped header, covering the usual
+  # bank-export wordings in the app's supported locales (en fr de es it tr nb
+  # ca ro ru pl pt nl hu vi uk zh); extend when an export isn't recognised (the
   # user can always pick the columns by hand).
-  DEBIT_HEADER_RE = /\A(debit|withdrawal|paid out|money out|outflow|soll\b|ausgang|cargo|addebit)/i
-  CREDIT_HEADER_RE = /\A(credit|deposit|paid in|money in|inflow|haben\b|eingang|abono|accredit)/i
-  AMOUNT_HEADER_RE = /\A(amount|montant|betrag|importe|importo|valor|bedrag|kwota)/i
-  NAME_HEADER_RE = /\A(libelle|description|label|payee|merchant|details?|memo|narrative|text|concepto|verwendungszweck|beneficiaire|operation|omschrijving|causale)/i
-  VALUE_DATE_HEADER_RE = /\A(valeur|value|valuta|wertstellung|fecha valor|date de valeur|data valuta)/i
-  BALANCE_HEADER_RE = /\A(solde|balance|saldo|kontostand|running)/i
+  DEBIT_HEADER_RE = /\A(debit|debet|withdrawal|paid out|money out|outflow|soll\b|ausgang|cargo|addebit|dare\b|uscit|carrec|af\b|ut\b|obciaz|borc|terheles|ghi no|дебет|расход|списан|видат|支出|借方)/i
+  CREDIT_HEADER_RE = /\A(credit|deposit|paid in|money in|inflow|haben\b|eingang|abono|accredit|avere\b|entrat|abonament|bij\b|inn\b|uznani|alacak|jovairas|ghi co|кредит|приход|зачислен|надходж|зарахув|收入|存入|贷方|貸方)/i
+  AMOUNT_HEADER_RE = /\A(amount|montant|betrag|importe|importo|import\b|valor|bedrag|kwota|suma\b|tutar|osszeg|bel[oø]p|so tien|сумм|сума|金额|金額)/i
+  NAME_HEADER_RE = /\A(libelle|description|descripcion|descricao|descrizione|descriere|beschreibung|beskrivelse|label|payee|merchant|details?|detalii|memo|narrative|text|tekst|concepto|concepte|verwendungszweck|beneficiaire|operation|omschrijving|causale|opis|ac[iı]klama|kozlemeny|leiras|noi dung|dien giai|описан|назначен|опис|призначен|摘要|交易描述|说明|說明|备注|備註)/i
+  VALUE_DATE_HEADER_RE = /\A(valeur|value|valuta|wertstellung|fecha valor|date de valeur|data valuta|data waluty|data valor|дата валют|ngay hieu luc|起息)/i
+  BALANCE_HEADER_RE = /\A(solde|balance|saldo|kontostand|running|sold\b|bakiye|egyenleg|остат|баланс|залиш|so du|余额|餘額|結餘)/i
   TEXT_DATE_RE = %r{\A\d{1,4}[./-]\d{1,2}[./-]\d{1,4}\z}
 
   # How many rows below a candidate header are inspected to confirm it.
@@ -152,6 +153,7 @@ class XlsxImport < Import
       end
 
       rows.destroy_all
+      new_rows.reject! { |row| excluded_row_name?(row[:name]) }
       new_rows.each_with_index { |row, index| row[:source_row_number] = index + 1 }
       Import::Row.insert_all!(new_rows) if new_rows.any?
       # destroy_all loaded the (now empty) rows association and insert_all!

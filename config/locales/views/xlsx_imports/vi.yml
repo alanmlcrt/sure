@@ -1,0 +1,51 @@
+---
+vi:
+  import:
+    sheet_selections:
+      show:
+        title: "Chọn trang tính cần nhập"
+        description: "Đánh dấu các trang tính cần nhập và gán mỗi trang cho một tài khoản. Các dòng tiêu đề và cột được nhận diện tự động: hãy kiểm tra trong bản xem trước và bấm Làm mới sau khi thay đổi số dòng cần bỏ qua."
+        finalize_upload: "Vui lòng hoàn tất việc tải tệp lên."
+        invalid_file: "Không thể đọc bảng tính này: %{message}"
+        none: "Bảng tính này không có trang tính hiển thị nào chứa dữ liệu."
+        back_to_imports: "Quay lại trang nhập"
+        date_format_label: "Định dạng ngày"
+        number_format_label: "Định dạng số"
+        signage_label: "Số tiền"
+        incomes_are_positive: "Thu nhập là số dương"
+        incomes_are_negative: "Thu nhập là số âm"
+        formats_hint: "Định dạng ngày và số chỉ áp dụng cho các ô được lưu dưới dạng văn bản; ngày và số thực của Excel được đọc nguyên trạng."
+        rows_count:
+          one: "%{count} dòng"
+          other: "%{count} dòng"
+        account_label: "Tài khoản"
+        create_new_account: "Tạo tài khoản mới"
+        new_account_name_placeholder: "Tên tài khoản mới"
+        rows_to_skip_label: "Số dòng bỏ qua"
+        date_col_label: "Cột ngày"
+        name_col_label: "Cột diễn giải"
+        amount_col_label: "Cột số tiền"
+        refresh: "Làm mới"
+        import_selected: "Nhập các trang tính đã chọn"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Vui lòng chọn ít nhất một trang tính để nhập."
+        sheets_imported: "Đã nhập các trang tính. Hãy kiểm tra dữ liệu bên dưới."
+  imports:
+    xlsx:
+      column: "Cột %{number}"
+      computed_amount_header: "Số tiền (ghi có - ghi nợ)"
+      unknown_sheet: "Không tìm thấy trang tính %{sheet} trong tệp."
+      missing_columns: "Hãy chọn một cột ngày và một cột số tiền cho trang tính %{sheet}."
+    type_labels:
+      xlsx_import: "Nhập từ Excel"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Nhập bảng tính Excel"
+      import_xlsx_description: "Sao kê ngân hàng (.xlsx), mỗi tài khoản một trang tính"
+    create:
+      xlsx_uploaded: "Đã tải bảng tính lên. Hãy chọn các trang tính cần nhập."
+      invalid_xlsx_file_type: "Loại tệp không hợp lệ. Vui lòng tải lên bảng tính .xlsx."

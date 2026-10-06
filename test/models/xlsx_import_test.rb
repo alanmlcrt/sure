@@ -75,6 +75,15 @@ class XlsxImportTest < ActiveSupport::TestCase
     end
   end
 
+  test "skips rows whose name matches a family import exclusion" do
+    @family.import_exclusions.create!(name: "interets 2025") # case-insensitive match
+    cpt = @import.sheet_tables.find { |t| t.name == CPT_SHEET }
+
+    @import.apply_sheet_selections!([ selection(cpt, "account_id" => "new") ])
+
+    assert_equal [ "PAIEMENT CB CARREFOUR" ], @import.rows.pluck(:name)
+  end
+
   # One sheet per bank-export layout, see generate_formats.py.
   # sheet => [rows to skip, date header, label header, amount header, first imported row]
   FORMATS = {
@@ -92,7 +101,11 @@ class XlsxImportTest < ActiveSupport::TestCase
     "summary_block" => [ 3, "Date", "Libellé", "Montant", [ "2024-12-01", "ACHAT", "-20.0" ] ],
     "spanish" => [ 1, "Fecha", "Concepto", "Importe", [ "2024-01-10", "Supermercado", "-35.1" ] ],
     "unknown_amount_header" => [ 0, "Jour", "Opération", "Somme", [ "2024-02-01", "Boulangerie", "-2.3" ] ],
-    "merged_banners" => [ 4, "Date", "Libellé", "Montant", [ "2026-08-18", "OPENAI CHATGPT", "-23.0" ] ]
+    "merged_banners" => [ 4, "Date", "Libellé", "Montant", [ "2026-08-18", "OPENAI CHATGPT", "-23.0" ] ],
+    "polish" => [ 2, "Data operacji", "Opis", "Amount (credit - debit)", [ "2024-03-04", "Biedronka", "-45.2" ] ],
+    "russian" => [ 1, "Дата", "Описание", "Сумма", [ "2024-04-01", "Пятёрочка", "-1250.5" ] ],
+    "turkish" => [ 2, "İşlem tarihi", "Açıklama", "Tutar", [ "2024-05-02", "Market alışverişi", "-320.75" ] ],
+    "chinese" => [ 1, "交易日期", "摘要", "Amount (credit - debit)", [ "2024-06-01", "超市购物", "-88.5" ] ]
   }.freeze
 
   test "finds the table and its columns in many bank layouts" do
@@ -118,6 +131,14 @@ class XlsxImportTest < ActiveSupport::TestCase
     assert_not tables.fetch("notes_only").importable?
   end
 
+  test "every supported locale translates the Excel import" do
+    expected = locale_keys("en")
+
+    LanguagesHelper::SUPPORTED_LOCALES.each do |locale|
+      assert_equal expected, locale_keys(locale), "config/locales/views/xlsx_imports/#{locale}.yml"
+    end
+  end
+
   test "guess_header_row finds the header after title rows in a text-only sheet" do
     rows = [
       [ "Bank statement" ],
@@ -137,6 +158,14 @@ class XlsxImportTest < ActiveSupport::TestCase
   end
 
   private
+    # Leaf keys of a locale file, plural forms collapsed (their categories
+    # differ per language).
+    def locale_keys(locale)
+      tree = YAML.load_file(Rails.root.join("config/locales/views/xlsx_imports/#{locale}.yml")).fetch(locale)
+      flatten = ->(node, path) { node.is_a?(Hash) && !node.key?("other") ? node.flat_map { |k, v| flatten.(v, "#{path}.#{k}") } : [ path ] }
+      flatten.(tree, "").sort
+    end
+
     def selection(table, overrides = {})
       {
         "sheet_name" => table.name,
