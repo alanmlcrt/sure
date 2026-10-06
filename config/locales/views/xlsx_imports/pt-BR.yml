@@ -1,0 +1,51 @@
+---
+pt-BR:
+  import:
+    sheet_selections:
+      show:
+        title: "Selecione as planilhas a importar"
+        description: "Marque as planilhas a importar e associe cada uma a uma conta. As linhas de título e as colunas são detectadas automaticamente: confira-as na pré-visualização e clique em Atualizar depois de alterar as linhas a ignorar."
+        finalize_upload: "Finalize o envio do arquivo."
+        invalid_file: "Não foi possível ler este arquivo do Excel: %{message}"
+        none: "Este arquivo do Excel não tem planilhas visíveis com dados."
+        back_to_imports: "Voltar às importações"
+        date_format_label: "Formato de data"
+        number_format_label: "Formato de número"
+        signage_label: "Valores"
+        incomes_are_positive: "Receitas são positivas"
+        incomes_are_negative: "Receitas são negativas"
+        formats_hint: "Os formatos de data e número só valem para células salvas como texto; datas e números reais do Excel são lidos como estão."
+        rows_count:
+          one: "1 linha"
+          other: "%{count} linhas"
+        account_label: "Conta"
+        create_new_account: "Criar nova conta"
+        new_account_name_placeholder: "Nome da nova conta"
+        rows_to_skip_label: "Linhas a ignorar"
+        date_col_label: "Coluna de data"
+        name_col_label: "Coluna de descrição"
+        amount_col_label: "Coluna de valor"
+        refresh: "Atualizar"
+        import_selected: "Importar planilhas selecionadas"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Selecione pelo menos uma planilha para importar."
+        sheets_imported: "Planilhas importadas. Revise seus dados abaixo."
+  imports:
+    xlsx:
+      column: "Coluna %{number}"
+      computed_amount_header: "Valor (crédito - débito)"
+      unknown_sheet: "A planilha %{sheet} não foi encontrada no arquivo."
+      missing_columns: "Escolha uma coluna de data e uma de valor para a planilha %{sheet}."
+    type_labels:
+      xlsx_import: "Importação do Excel"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Importar arquivo do Excel"
+      import_xlsx_description: "Extrato bancário (.xlsx), uma planilha por conta"
+    create:
+      xlsx_uploaded: "Arquivo enviado. Selecione as planilhas a importar."
+      invalid_xlsx_file_type: "Tipo de arquivo inválido. Envie um arquivo .xlsx."

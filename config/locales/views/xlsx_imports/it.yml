@@ -1,0 +1,51 @@
+---
+it:
+  import:
+    sheet_selections:
+      show:
+        title: "Seleziona i fogli da importare"
+        description: "Spunta i fogli da importare e associa ciascuno a un conto. Le righe di titolo e le colonne vengono rilevate automaticamente: controllale nell'anteprima e premi Aggiorna dopo aver modificato le righe da saltare."
+        finalize_upload: "Completa il caricamento del file."
+        invalid_file: "Impossibile leggere questo foglio di calcolo: %{message}"
+        none: "Questo foglio di calcolo non contiene fogli visibili con dati."
+        back_to_imports: "Torna alle importazioni"
+        date_format_label: "Formato data"
+        number_format_label: "Formato numerico"
+        signage_label: "Importi"
+        incomes_are_positive: "Le entrate sono positive"
+        incomes_are_negative: "Le entrate sono negative"
+        formats_hint: "I formati di data e numero valgono solo per le celle salvate come testo; date e numeri reali di Excel vengono letti così come sono."
+        rows_count:
+          one: "1 riga"
+          other: "%{count} righe"
+        account_label: "Conto"
+        create_new_account: "Crea nuovo conto"
+        new_account_name_placeholder: "Nome del nuovo conto"
+        rows_to_skip_label: "Righe da saltare"
+        date_col_label: "Colonna data"
+        name_col_label: "Colonna descrizione"
+        amount_col_label: "Colonna importo"
+        refresh: "Aggiorna"
+        import_selected: "Importa i fogli selezionati"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Seleziona almeno un foglio da importare."
+        sheets_imported: "Fogli importati. Controlla i dati qui sotto."
+  imports:
+    xlsx:
+      column: "Colonna %{number}"
+      computed_amount_header: "Importo (avere - dare)"
+      unknown_sheet: "Il foglio %{sheet} non è stato trovato nel file."
+      missing_columns: "Scegli una colonna data e una colonna importo per il foglio %{sheet}."
+    type_labels:
+      xlsx_import: "Importazione Excel"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Importa foglio di calcolo Excel"
+      import_xlsx_description: "Esportazione bancaria (.xlsx), un foglio per conto"
+    create:
+      xlsx_uploaded: "Foglio di calcolo caricato. Seleziona i fogli da importare."
+      invalid_xlsx_file_type: "Tipo di file non valido. Carica un foglio di calcolo .xlsx."

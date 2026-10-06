@@ -155,7 +155,35 @@ put(wb.create_sheet("merged_banners"), 1, 1, [
     [D(2026, 8, 17), "ENTERPRISE RENT", 200.0, "EUR"],
 ])
 
-# 16. Notes only, no table.
+# 16-19. Headers in other supported languages and scripts.
+put(wb.create_sheet("polish"), 1, 1, [
+    ["Historia rachunku"],
+    [],
+    ["Data operacji", "Opis", "Obciążenia", "Uznania", "Saldo"],
+    [D(2024, 3, 4), "Biedronka", -45.2, None, 955.0],
+    [D(2024, 3, 5), "Wynagrodzenie", None, 5200.0, 6155.0],
+])
+put(wb.create_sheet("russian"), 1, 1, [
+    ["Выписка по счёту"],
+    ["Дата", "Описание", "Сумма", "Остаток"],
+    [D(2024, 4, 1), "Пятёрочка", -1250.5, 8749.5],
+    [D(2024, 4, 2), "Зарплата", 60000.0, 68749.5],
+])
+put(wb.create_sheet("turkish"), 1, 1, [
+    ["Hesap hareketleri"],
+    [],
+    ["İşlem tarihi", "Açıklama", "Tutar", "Bakiye"],
+    [D(2024, 5, 2), "Market alışverişi", -320.75, 4679.25],
+    [D(2024, 5, 3), "Maaş", 25000.0, 29679.25],
+])
+put(wb.create_sheet("chinese"), 1, 1, [
+    ["交易明细"],
+    ["交易日期", "摘要", "支出", "收入", "余额"],
+    [D(2024, 6, 1), "超市购物", 88.5, None, 911.5],
+    [D(2024, 6, 2), "工资", None, 8000.0, 8911.5],
+])
+
+# 20. Notes only, no table.
 put(wb.create_sheet("notes_only"), 1, 1, [
     ["Ce fichier a été généré automatiquement."],
     ["Aucune opération sur la période."],

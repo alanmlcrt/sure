@@ -1,36 +1,6 @@
 ---
 fr:
   import:
-    sheet_selections:
-      show:
-        title: Choisir les feuilles à importer
-        description: "Cochez les feuilles à importer et associez chacune à un compte. Les lignes de titre et les colonnes sont détectées automatiquement : vérifiez-les dans l'aperçu, et cliquez sur Actualiser après avoir modifié les lignes à ignorer."
-        finalize_upload: Veuillez finaliser l'envoi du fichier.
-        invalid_file: "Impossible de lire ce classeur : %{message}"
-        none: Ce classeur ne contient aucune feuille visible avec des données.
-        back_to_imports: Retour aux imports
-        date_format_label: Format de date
-        number_format_label: Format des nombres
-        signage_label: Montants
-        incomes_are_positive: Revenus positifs
-        incomes_are_negative: Revenus négatifs
-        formats_hint: Les formats de date et de nombre ne servent que pour les cellules stockées en texte ; les vraies dates et nombres Excel sont lus tels quels.
-        rows_count:
-          one: "1 ligne"
-          other: "%{count} lignes"
-        account_label: Compte
-        create_new_account: Créer un nouveau compte
-        new_account_name_placeholder: Nom du nouveau compte
-        rows_to_skip_label: Lignes à ignorer
-        date_col_label: Colonne date
-        name_col_label: Colonne libellé
-        amount_col_label: Colonne montant
-        no_column: "—"
-        refresh: Actualiser
-        import_selected: Importer les feuilles sélectionnées
-      update:
-        no_sheets_selected: Veuillez sélectionner au moins une feuille à importer.
-        sheets_imported: Feuilles importées. Vérifiez vos données ci-dessous.
     cleans:
       show:
         all_rows: Toutes les lignes
@@ -260,11 +230,6 @@ fr:
       update:
         qif_uploaded: Fichier QIF téléchargé avec succès.
   imports:
-    xlsx:
-      column: "Colonne %{number}"
-      computed_amount_header: "Montant (crédit - débit)"
-      unknown_sheet: "La feuille %{sheet} est introuvable dans le fichier."
-      missing_columns: "Choisissez une colonne date et une colonne montant pour la feuille %{sheet}."
     apply_template:
       no_template_found: Aucun modèle trouvé, veuillez configurer manuellement votre importation.
       template_applied: Modèle appliqué.
@@ -293,8 +258,6 @@ fr:
     create:
       csv_uploaded: CSV téléversé avec succès.
       document_provider_not_configured: Aucun magasin de vecteurs n'est configuré pour les téléversements de documents.
-      xlsx_uploaded: Classeur envoyé. Choisissez les feuilles à importer.
-      invalid_xlsx_file_type: Type de fichier invalide. Veuillez envoyer un classeur .xlsx.
       document_too_large: Le document est trop volumineux. La taille maximale est de %{max_size} Mo.
       document_upload_failed: Nous n'avons pas pu téléverser le document dans le magasin de vecteurs. Veuillez réessayer.
       document_uploaded: Document téléversé avec succès.
@@ -376,8 +339,6 @@ fr:
       import_rules: Importer les règles
       import_sure: Importer depuis Sure
       import_sure_description: Fichier .ndjson d'export complet
-      import_xlsx: Importer un classeur Excel
-      import_xlsx_description: Export bancaire (.xlsx), une feuille par compte
       import_transactions: Importer les transactions
       import_ynab: Importer depuis YNAB
       requires_account: Importez d'abord des comptes pour débloquer cette option.
@@ -526,7 +487,6 @@ fr:
           qif_import: QIF
           rule_import: Règle
           sure_import: Sure
-          xlsx_import: Excel
           trade_import: Transaction boursière
           transaction_import: Transaction
           ynab_import: YNAB
@@ -542,7 +502,6 @@ fr:
       qif_import: Import QIF
       rule_import: Import de règles
       sure_import: Import Sure
-      xlsx_import: Import Excel
       trade_import: Import de transactions boursières
       transaction_import: Import de transactions
       ynab_import: Importation YNAB

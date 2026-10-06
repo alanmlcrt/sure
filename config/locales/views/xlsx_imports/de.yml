@@ -1,0 +1,51 @@
+---
+de:
+  import:
+    sheet_selections:
+      show:
+        title: "Zu importierende Tabellenblätter auswählen"
+        description: "Wähle die zu importierenden Blätter aus und ordne jedes einem Konto zu. Titelzeilen und Spalten werden automatisch erkannt: Prüfe sie in der Vorschau und klicke nach dem Ändern der zu überspringenden Zeilen auf Aktualisieren."
+        finalize_upload: "Bitte schließe den Datei-Upload ab."
+        invalid_file: "Diese Tabelle konnte nicht gelesen werden: %{message}"
+        none: "Diese Tabelle enthält keine sichtbaren Blätter mit Daten."
+        back_to_imports: "Zurück zu den Importen"
+        date_format_label: "Datumsformat"
+        number_format_label: "Zahlenformat"
+        signage_label: "Beträge"
+        incomes_are_positive: "Einnahmen sind positiv"
+        incomes_are_negative: "Einnahmen sind negativ"
+        formats_hint: "Datums- und Zahlenformate gelten nur für als Text gespeicherte Zellen; echte Excel-Datumswerte und -Zahlen werden direkt gelesen."
+        rows_count:
+          one: "1 Zeile"
+          other: "%{count} Zeilen"
+        account_label: "Konto"
+        create_new_account: "Neues Konto erstellen"
+        new_account_name_placeholder: "Name des neuen Kontos"
+        rows_to_skip_label: "Zu überspringende Zeilen"
+        date_col_label: "Datumsspalte"
+        name_col_label: "Beschreibungsspalte"
+        amount_col_label: "Betragsspalte"
+        refresh: "Aktualisieren"
+        import_selected: "Ausgewählte Blätter importieren"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Bitte wähle mindestens ein Blatt zum Importieren aus."
+        sheets_imported: "Blätter importiert. Überprüfe deine Daten unten."
+  imports:
+    xlsx:
+      column: "Spalte %{number}"
+      computed_amount_header: "Betrag (Haben - Soll)"
+      unknown_sheet: "Das Blatt %{sheet} wurde in der Datei nicht gefunden."
+      missing_columns: "Wähle eine Datums- und eine Betragsspalte für das Blatt %{sheet}."
+    type_labels:
+      xlsx_import: "Excel-Import"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Excel-Tabelle importieren"
+      import_xlsx_description: "Bankexport (.xlsx), ein Blatt pro Konto"
+    create:
+      xlsx_uploaded: "Tabelle hochgeladen. Wähle die zu importierenden Blätter aus."
+      invalid_xlsx_file_type: "Ungültiger Dateityp. Bitte lade eine .xlsx-Tabelle hoch."

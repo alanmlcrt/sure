@@ -1,0 +1,51 @@
+---
+zh-TW:
+  import:
+    sheet_selections:
+      show:
+        title: "選擇要匯入的工作表"
+        description: "勾選要匯入的工作表，並為每個工作表連結一個帳戶。標題列與欄位會自動偵測：請在預覽中確認，修改要略過的列數後點選「重新整理」。"
+        finalize_upload: "請完成檔案上傳。"
+        invalid_file: "無法讀取此試算表：%{message}"
+        none: "此試算表中沒有包含資料的可見工作表。"
+        back_to_imports: "返回匯入"
+        date_format_label: "日期格式"
+        number_format_label: "數字格式"
+        signage_label: "金額"
+        incomes_are_positive: "收入為正數"
+        incomes_are_negative: "收入為負數"
+        formats_hint: "日期與數字格式僅適用於以文字儲存的儲存格；真正的 Excel 日期與數字會依原樣讀取。"
+        rows_count:
+          one: "%{count} 列"
+          other: "%{count} 列"
+        account_label: "帳戶"
+        create_new_account: "建立新帳戶"
+        new_account_name_placeholder: "新帳戶名稱"
+        rows_to_skip_label: "略過的列數"
+        date_col_label: "日期欄"
+        name_col_label: "描述欄"
+        amount_col_label: "金額欄"
+        refresh: "重新整理"
+        import_selected: "匯入所選工作表"
+        no_column: "—"
+      update:
+        no_sheets_selected: "請至少選擇一個要匯入的工作表。"
+        sheets_imported: "工作表已匯入。請在下方檢查資料。"
+  imports:
+    xlsx:
+      column: "第 %{number} 欄"
+      computed_amount_header: "金額（存入 - 支出）"
+      unknown_sheet: "檔案中找不到工作表 %{sheet}。"
+      missing_columns: "請為工作表 %{sheet} 選擇日期欄與金額欄。"
+    type_labels:
+      xlsx_import: "Excel 匯入"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "匯入 Excel 試算表"
+      import_xlsx_description: "銀行匯出檔 (.xlsx)，每個帳戶一個工作表"
+    create:
+      xlsx_uploaded: "試算表已上傳。請選擇要匯入的工作表。"
+      invalid_xlsx_file_type: "檔案類型無效。請上傳 .xlsx 試算表。"

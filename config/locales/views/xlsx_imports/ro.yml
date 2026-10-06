@@ -1,0 +1,52 @@
+---
+ro:
+  import:
+    sheet_selections:
+      show:
+        title: "Selectează foile de importat"
+        description: "Bifează foile de importat și asociază fiecăreia un cont. Rândurile de titlu și coloanele sunt detectate automat: verifică-le în previzualizare și apasă Reîmprospătează după ce modifici rândurile de ignorat."
+        finalize_upload: "Te rugăm să finalizezi încărcarea fișierului."
+        invalid_file: "Nu am putut citi această foaie de calcul: %{message}"
+        none: "Această foaie de calcul nu are foi vizibile cu date."
+        back_to_imports: "Înapoi la importuri"
+        date_format_label: "Format dată"
+        number_format_label: "Format număr"
+        signage_label: "Sume"
+        incomes_are_positive: "Veniturile sunt pozitive"
+        incomes_are_negative: "Veniturile sunt negative"
+        formats_hint: "Formatele de dată și număr contează doar pentru celulele salvate ca text; datele și numerele reale din Excel sunt citite ca atare."
+        rows_count:
+          one: "1 rând"
+          few: "%{count} rânduri"
+          other: "%{count} de rânduri"
+        account_label: "Cont"
+        create_new_account: "Creează cont nou"
+        new_account_name_placeholder: "Numele contului nou"
+        rows_to_skip_label: "Rânduri de ignorat"
+        date_col_label: "Coloana dată"
+        name_col_label: "Coloana descriere"
+        amount_col_label: "Coloana sumă"
+        refresh: "Reîmprospătează"
+        import_selected: "Importă foile selectate"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Selectează cel puțin o foaie de importat."
+        sheets_imported: "Foile au fost importate. Verifică datele mai jos."
+  imports:
+    xlsx:
+      column: "Coloana %{number}"
+      computed_amount_header: "Sumă (credit - debit)"
+      unknown_sheet: "Foaia %{sheet} nu a fost găsită în fișier."
+      missing_columns: "Alege o coloană de dată și una de sumă pentru foaia %{sheet}."
+    type_labels:
+      xlsx_import: "Import Excel"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Importă foaie de calcul Excel"
+      import_xlsx_description: "Export bancar (.xlsx), o foaie per cont"
+    create:
+      xlsx_uploaded: "Foaia de calcul a fost încărcată. Selectează foile de importat."
+      invalid_xlsx_file_type: "Tip de fișier invalid. Încarcă o foaie de calcul .xlsx."

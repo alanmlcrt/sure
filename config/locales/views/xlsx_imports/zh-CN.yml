@@ -1,0 +1,51 @@
+---
+zh-CN:
+  import:
+    sheet_selections:
+      show:
+        title: "选择要导入的工作表"
+        description: "勾选要导入的工作表，并为每个工作表关联一个账户。标题行和列会被自动识别：请在预览中检查，修改要跳过的行数后点击“刷新”。"
+        finalize_upload: "请完成文件上传。"
+        invalid_file: "无法读取此电子表格：%{message}"
+        none: "此电子表格中没有包含数据的可见工作表。"
+        back_to_imports: "返回导入"
+        date_format_label: "日期格式"
+        number_format_label: "数字格式"
+        signage_label: "金额"
+        incomes_are_positive: "收入为正数"
+        incomes_are_negative: "收入为负数"
+        formats_hint: "日期和数字格式仅适用于以文本形式存储的单元格；真正的 Excel 日期和数字会按原样读取。"
+        rows_count:
+          one: "%{count} 行"
+          other: "%{count} 行"
+        account_label: "账户"
+        create_new_account: "创建新账户"
+        new_account_name_placeholder: "新账户名称"
+        rows_to_skip_label: "跳过的行数"
+        date_col_label: "日期列"
+        name_col_label: "描述列"
+        amount_col_label: "金额列"
+        refresh: "刷新"
+        import_selected: "导入所选工作表"
+        no_column: "—"
+      update:
+        no_sheets_selected: "请至少选择一个要导入的工作表。"
+        sheets_imported: "工作表已导入。请在下方检查数据。"
+  imports:
+    xlsx:
+      column: "第 %{number} 列"
+      computed_amount_header: "金额（收入 - 支出）"
+      unknown_sheet: "在文件中找不到工作表 %{sheet}。"
+      missing_columns: "请为工作表 %{sheet} 选择日期列和金额列。"
+    type_labels:
+      xlsx_import: "Excel 导入"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "导入 Excel 电子表格"
+      import_xlsx_description: "银行导出文件 (.xlsx)，每个账户一个工作表"
+    create:
+      xlsx_uploaded: "电子表格已上传。请选择要导入的工作表。"
+      invalid_xlsx_file_type: "文件类型无效。请上传 .xlsx 电子表格。"

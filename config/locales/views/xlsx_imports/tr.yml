@@ -1,0 +1,51 @@
+---
+tr:
+  import:
+    sheet_selections:
+      show:
+        title: "İçe aktarılacak sayfaları seçin"
+        description: "İçe aktarılacak sayfaları işaretleyin ve her birini bir hesapla eşleştirin. Başlık satırları ve sütunlar otomatik olarak algılanır: önizlemede kontrol edin ve atlanacak satırları değiştirdikten sonra Yenile'ye basın."
+        finalize_upload: "Lütfen dosya yüklemesini tamamlayın."
+        invalid_file: "Bu elektronik tablo okunamadı: %{message}"
+        none: "Bu elektronik tabloda veri içeren görünür sayfa yok."
+        back_to_imports: "İçe aktarmalara dön"
+        date_format_label: "Tarih biçimi"
+        number_format_label: "Sayı biçimi"
+        signage_label: "Tutarlar"
+        incomes_are_positive: "Gelirler pozitif"
+        incomes_are_negative: "Gelirler negatif"
+        formats_hint: "Tarih ve sayı biçimleri yalnızca metin olarak saklanan hücreler için geçerlidir; gerçek Excel tarihleri ve sayıları olduğu gibi okunur."
+        rows_count:
+          one: "1 satır"
+          other: "%{count} satır"
+        account_label: "Hesap"
+        create_new_account: "Yeni hesap oluştur"
+        new_account_name_placeholder: "Yeni hesap adı"
+        rows_to_skip_label: "Atlanacak satırlar"
+        date_col_label: "Tarih sütunu"
+        name_col_label: "Açıklama sütunu"
+        amount_col_label: "Tutar sütunu"
+        refresh: "Yenile"
+        import_selected: "Seçili sayfaları içe aktar"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Lütfen içe aktarmak için en az bir sayfa seçin."
+        sheets_imported: "Sayfalar içe aktarıldı. Verilerinizi aşağıda gözden geçirin."
+  imports:
+    xlsx:
+      column: "Sütun %{number}"
+      computed_amount_header: "Tutar (alacak - borç)"
+      unknown_sheet: "%{sheet} sayfası dosyada bulunamadı."
+      missing_columns: "%{sheet} sayfası için bir tarih ve bir tutar sütunu seçin."
+    type_labels:
+      xlsx_import: "Excel içe aktarma"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Excel elektronik tablosunu içe aktar"
+      import_xlsx_description: "Banka dışa aktarımı (.xlsx), hesap başına bir sayfa"
+    create:
+      xlsx_uploaded: "Elektronik tablo yüklendi. İçe aktarılacak sayfaları seçin."
+      invalid_xlsx_file_type: "Geçersiz dosya türü. Lütfen bir .xlsx elektronik tablosu yükleyin."

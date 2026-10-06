@@ -1,0 +1,53 @@
+---
+uk:
+  import:
+    sheet_selections:
+      show:
+        title: "Виберіть аркуші для імпорту"
+        description: "Позначте аркуші для імпорту та зіставте кожен із рахунком. Рядки заголовків і стовпці визначаються автоматично: перевірте їх у попередньому перегляді та натисніть «Оновити» після зміни кількості пропущених рядків."
+        finalize_upload: "Будь ласка, завершіть завантаження файлу."
+        invalid_file: "Не вдалося прочитати цю таблицю: %{message}"
+        none: "У цій таблиці немає видимих аркушів із даними."
+        back_to_imports: "Назад до імпорту"
+        date_format_label: "Формат дати"
+        number_format_label: "Формат чисел"
+        signage_label: "Суми"
+        incomes_are_positive: "Доходи додатні"
+        incomes_are_negative: "Доходи від'ємні"
+        formats_hint: "Формати дати й чисел важливі лише для клітинок, збережених як текст; справжні дати й числа Excel читаються як є."
+        rows_count:
+          one: "%{count} рядок"
+          few: "%{count} рядки"
+          many: "%{count} рядків"
+          other: "%{count} рядка"
+        account_label: "Рахунок"
+        create_new_account: "Створити новий рахунок"
+        new_account_name_placeholder: "Назва нового рахунку"
+        rows_to_skip_label: "Рядки для пропуску"
+        date_col_label: "Стовпець дати"
+        name_col_label: "Стовпець опису"
+        amount_col_label: "Стовпець суми"
+        refresh: "Оновити"
+        import_selected: "Імпортувати вибрані аркуші"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Виберіть принаймні один аркуш для імпорту."
+        sheets_imported: "Аркуші імпортовано. Перевірте дані нижче."
+  imports:
+    xlsx:
+      column: "Стовпець %{number}"
+      computed_amount_header: "Сума (кредит - дебет)"
+      unknown_sheet: "Аркуш %{sheet} не знайдено у файлі."
+      missing_columns: "Виберіть стовпець дати та стовпець суми для аркуша %{sheet}."
+    type_labels:
+      xlsx_import: "Імпорт Excel"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Імпортувати таблицю Excel"
+      import_xlsx_description: "Банківська виписка (.xlsx), один аркуш на рахунок"
+    create:
+      xlsx_uploaded: "Таблицю завантажено. Виберіть аркуші для імпорту."
+      invalid_xlsx_file_type: "Неприпустимий тип файлу. Завантажте таблицю .xlsx."
