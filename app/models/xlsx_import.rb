@@ -153,7 +153,6 @@ class XlsxImport < Import
       end
 
       rows.destroy_all
-      new_rows.reject! { |row| excluded_row_name?(row[:name]) }
       new_rows.each_with_index { |row, index| row[:source_row_number] = index + 1 }
       Import::Row.insert_all!(new_rows) if new_rows.any?
       # destroy_all loaded the (now empty) rows association and insert_all!

@@ -75,15 +75,6 @@ class XlsxImportTest < ActiveSupport::TestCase
     end
   end
 
-  test "skips rows whose name matches a family import exclusion" do
-    @family.import_exclusions.create!(name: "interets 2025") # case-insensitive match
-    cpt = @import.sheet_tables.find { |t| t.name == CPT_SHEET }
-
-    @import.apply_sheet_selections!([ selection(cpt, "account_id" => "new") ])
-
-    assert_equal [ "PAIEMENT CB CARREFOUR" ], @import.rows.pluck(:name)
-  end
-
   # One sheet per bank-export layout, see generate_formats.py.
   # sheet => [rows to skip, date header, label header, amount header, first imported row]
   FORMATS = {
