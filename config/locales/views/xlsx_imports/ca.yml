@@ -25,6 +25,7 @@ ca:
         date_col_label: "Columna de data"
         name_col_label: "Columna de concepte"
         amount_col_label: "Columna d'import"
+        sign_col_label: "Columna càrrec/abonament"
         refresh: "Actualitza"
         import_selected: "Importa els fulls seleccionats"
         no_column: "—"

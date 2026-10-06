@@ -25,6 +25,7 @@ vi:
         date_col_label: "Cột ngày"
         name_col_label: "Cột diễn giải"
         amount_col_label: "Cột số tiền"
+        sign_col_label: "Cột ghi nợ/ghi có"
         refresh: "Làm mới"
         import_selected: "Nhập các trang tính đã chọn"
         no_column: "—"

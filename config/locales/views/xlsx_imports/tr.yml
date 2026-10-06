@@ -25,6 +25,7 @@ tr:
         date_col_label: "Tarih sütunu"
         name_col_label: "Açıklama sütunu"
         amount_col_label: "Tutar sütunu"
+        sign_col_label: "Borç/alacak sütunu"
         refresh: "Yenile"
         import_selected: "Seçili sayfaları içe aktar"
         no_column: "—"

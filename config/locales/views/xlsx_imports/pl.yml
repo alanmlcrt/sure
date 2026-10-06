@@ -27,6 +27,7 @@ pl:
         date_col_label: "Kolumna daty"
         name_col_label: "Kolumna opisu"
         amount_col_label: "Kolumna kwoty"
+        sign_col_label: "Kolumna obciążenie/uznanie"
         refresh: "Odśwież"
         import_selected: "Importuj wybrane arkusze"
         no_column: "—"

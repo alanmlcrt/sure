@@ -25,6 +25,7 @@ zh-CN:
         date_col_label: "日期列"
         name_col_label: "描述列"
         amount_col_label: "金额列"
+        sign_col_label: "借贷方向列"
         refresh: "刷新"
         import_selected: "导入所选工作表"
         no_column: "—"

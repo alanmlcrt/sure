@@ -25,6 +25,7 @@ de:
         date_col_label: "Datumsspalte"
         name_col_label: "Beschreibungsspalte"
         amount_col_label: "Betragsspalte"
+        sign_col_label: "Soll/Haben-Spalte"
         refresh: "Aktualisieren"
         import_selected: "Ausgewählte Blätter importieren"
         no_column: "—"

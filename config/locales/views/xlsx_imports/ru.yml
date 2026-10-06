@@ -27,6 +27,7 @@ ru:
         date_col_label: "Столбец даты"
         name_col_label: "Столбец описания"
         amount_col_label: "Столбец суммы"
+        sign_col_label: "Столбец дебет/кредит"
         refresh: "Обновить"
         import_selected: "Импортировать выбранные листы"
         no_column: "—"
