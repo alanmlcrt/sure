@@ -18,6 +18,15 @@ class Import::SheetSelectionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='import[sheets][1][rows_to_skip]'][value='4']" # "titles" sheet
   end
 
+  test "show renders in every supported locale" do
+    LanguagesHelper::SUPPORTED_LOCALES.each do |locale|
+      get import_sheet_selection_url(@import, locale: locale)
+
+      assert_response :success, locale
+      assert_select "h1", I18n.t("import.sheet_selections.show.title", locale: locale)
+    end
+  end
+
   test "update imports the selected sheets" do
     put import_sheet_selection_url(@import), params: {
       import: {

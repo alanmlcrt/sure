@@ -1,0 +1,51 @@
+---
+ca:
+  import:
+    sheet_selections:
+      show:
+        title: "Selecciona els fulls que vols importar"
+        description: "Marca els fulls que vols importar i associa cadascun a un compte. Les files de títol i les columnes es detecten automàticament: revisa-les a la previsualització i prem Actualitza després de canviar les files que s'han d'ometre."
+        finalize_upload: "Acaba de pujar el fitxer."
+        invalid_file: "No hem pogut llegir aquest full de càlcul: %{message}"
+        none: "Aquest full de càlcul no té cap full visible amb dades."
+        back_to_imports: "Torna a les importacions"
+        date_format_label: "Format de data"
+        number_format_label: "Format de número"
+        signage_label: "Imports"
+        incomes_are_positive: "Els ingressos són positius"
+        incomes_are_negative: "Els ingressos són negatius"
+        formats_hint: "Els formats de data i de número només s'apliquen a les cel·les desades com a text; les dates i els números reals d'Excel es llegeixen tal com són."
+        rows_count:
+          one: "1 fila"
+          other: "%{count} files"
+        account_label: "Compte"
+        create_new_account: "Crea un compte nou"
+        new_account_name_placeholder: "Nom del compte nou"
+        rows_to_skip_label: "Files que s'han d'ometre"
+        date_col_label: "Columna de data"
+        name_col_label: "Columna de concepte"
+        amount_col_label: "Columna d'import"
+        refresh: "Actualitza"
+        import_selected: "Importa els fulls seleccionats"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Selecciona almenys un full per importar."
+        sheets_imported: "Fulls importats. Revisa les dades a continuació."
+  imports:
+    xlsx:
+      column: "Columna %{number}"
+      computed_amount_header: "Import (abonament - càrrec)"
+      unknown_sheet: "No s'ha trobat el full %{sheet} al fitxer."
+      missing_columns: "Tria una columna de data i una d'import per al full %{sheet}."
+    type_labels:
+      xlsx_import: "Importació d'Excel"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Importa un full de càlcul d'Excel"
+      import_xlsx_description: "Exportació bancària (.xlsx), un full per compte"
+    create:
+      xlsx_uploaded: "Full de càlcul pujat. Selecciona els fulls que vols importar."
+      invalid_xlsx_file_type: "Tipus de fitxer no vàlid. Puja un full de càlcul .xlsx."

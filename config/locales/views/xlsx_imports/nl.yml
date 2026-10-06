@@ -1,0 +1,51 @@
+---
+nl:
+  import:
+    sheet_selections:
+      show:
+        title: "Kies de werkbladen om te importeren"
+        description: "Vink de werkbladen aan die je wilt importeren en koppel elk aan een rekening. Titelrijen en kolommen worden automatisch herkend: controleer ze in het voorbeeld en klik op Vernieuwen nadat je het aantal over te slaan rijen hebt gewijzigd."
+        finalize_upload: "Rond het uploaden van het bestand af."
+        invalid_file: "We konden deze spreadsheet niet lezen: %{message}"
+        none: "Deze spreadsheet bevat geen zichtbare werkbladen met gegevens."
+        back_to_imports: "Terug naar imports"
+        date_format_label: "Datumnotatie"
+        number_format_label: "Getalnotatie"
+        signage_label: "Bedragen"
+        incomes_are_positive: "Inkomsten zijn positief"
+        incomes_are_negative: "Inkomsten zijn negatief"
+        formats_hint: "Datum- en getalnotaties gelden alleen voor cellen die als tekst zijn opgeslagen; echte Excel-datums en -getallen worden ongewijzigd gelezen."
+        rows_count:
+          one: "1 rij"
+          other: "%{count} rijen"
+        account_label: "Rekening"
+        create_new_account: "Nieuwe rekening aanmaken"
+        new_account_name_placeholder: "Naam van de nieuwe rekening"
+        rows_to_skip_label: "Over te slaan rijen"
+        date_col_label: "Datumkolom"
+        name_col_label: "Omschrijvingskolom"
+        amount_col_label: "Bedragkolom"
+        refresh: "Vernieuwen"
+        import_selected: "Geselecteerde werkbladen importeren"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Selecteer minstens één werkblad om te importeren."
+        sheets_imported: "Werkbladen geïmporteerd. Controleer je gegevens hieronder."
+  imports:
+    xlsx:
+      column: "Kolom %{number}"
+      computed_amount_header: "Bedrag (bij - af)"
+      unknown_sheet: "Werkblad %{sheet} is niet gevonden in het bestand."
+      missing_columns: "Kies een datumkolom en een bedragkolom voor werkblad %{sheet}."
+    type_labels:
+      xlsx_import: "Excel-import"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Excel-spreadsheet importeren"
+      import_xlsx_description: "Bankexport (.xlsx), één werkblad per rekening"
+    create:
+      xlsx_uploaded: "Spreadsheet geüpload. Kies de werkbladen om te importeren."
+      invalid_xlsx_file_type: "Ongeldig bestandstype. Upload een .xlsx-spreadsheet."

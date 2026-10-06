@@ -1,36 +1,6 @@
 ---
 fr:
   import:
-    sheet_selections:
-      show:
-        title: Choisir les feuilles à importer
-        description: "Cochez les feuilles à importer et associez chacune à un compte. Les lignes de titre et les colonnes sont détectées automatiquement : vérifiez-les dans l'aperçu, et cliquez sur Actualiser après avoir modifié les lignes à ignorer."
-        finalize_upload: Veuillez finaliser l'envoi du fichier.
-        invalid_file: "Impossible de lire ce classeur : %{message}"
-        none: Ce classeur ne contient aucune feuille visible avec des données.
-        back_to_imports: Retour aux imports
-        date_format_label: Format de date
-        number_format_label: Format des nombres
-        signage_label: Montants
-        incomes_are_positive: Revenus positifs
-        incomes_are_negative: Revenus négatifs
-        formats_hint: Les formats de date et de nombre ne servent que pour les cellules stockées en texte ; les vraies dates et nombres Excel sont lus tels quels.
-        rows_count:
-          one: "1 ligne"
-          other: "%{count} lignes"
-        account_label: Compte
-        create_new_account: Créer un nouveau compte
-        new_account_name_placeholder: Nom du nouveau compte
-        rows_to_skip_label: Lignes à ignorer
-        date_col_label: Colonne date
-        name_col_label: Colonne libellé
-        amount_col_label: Colonne montant
-        no_column: "—"
-        refresh: Actualiser
-        import_selected: Importer les feuilles sélectionnées
-      update:
-        no_sheets_selected: Veuillez sélectionner au moins une feuille à importer.
-        sheets_imported: Feuilles importées. Vérifiez vos données ci-dessous.
     cleans:
       show:
         all_rows: Toutes les lignes
@@ -245,11 +215,6 @@ fr:
       update:
         qif_uploaded: Fichier QIF téléchargé avec succès.
   imports:
-    xlsx:
-      column: "Colonne %{number}"
-      computed_amount_header: "Montant (crédit - débit)"
-      unknown_sheet: "La feuille %{sheet} est introuvable dans le fichier."
-      missing_columns: "Choisissez une colonne date et une colonne montant pour la feuille %{sheet}."
     apply_template:
       no_template_found: Aucun modèle trouvé, veuillez configurer manuellement votre importation.
       template_applied: Modèle appliqué.

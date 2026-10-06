@@ -1,0 +1,53 @@
+---
+pl:
+  import:
+    sheet_selections:
+      show:
+        title: "Wybierz arkusze do zaimportowania"
+        description: "Zaznacz arkusze do zaimportowania i przypisz każdy z nich do konta. Wiersze tytułowe i kolumny są wykrywane automatycznie: sprawdź je w podglądzie i kliknij Odśwież po zmianie liczby pomijanych wierszy."
+        finalize_upload: "Dokończ przesyłanie pliku."
+        invalid_file: "Nie udało się odczytać tego arkusza kalkulacyjnego: %{message}"
+        none: "Ten arkusz kalkulacyjny nie zawiera widocznych arkuszy z danymi."
+        back_to_imports: "Wróć do importów"
+        date_format_label: "Format daty"
+        number_format_label: "Format liczb"
+        signage_label: "Kwoty"
+        incomes_are_positive: "Przychody są dodatnie"
+        incomes_are_negative: "Przychody są ujemne"
+        formats_hint: "Formaty daty i liczb mają znaczenie tylko dla komórek zapisanych jako tekst; prawdziwe daty i liczby z Excela są odczytywane bez zmian."
+        rows_count:
+          one: "1 wiersz"
+          few: "%{count} wiersze"
+          many: "%{count} wierszy"
+          other: "%{count} wiersza"
+        account_label: "Konto"
+        create_new_account: "Utwórz nowe konto"
+        new_account_name_placeholder: "Nazwa nowego konta"
+        rows_to_skip_label: "Wiersze do pominięcia"
+        date_col_label: "Kolumna daty"
+        name_col_label: "Kolumna opisu"
+        amount_col_label: "Kolumna kwoty"
+        refresh: "Odśwież"
+        import_selected: "Importuj wybrane arkusze"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Wybierz co najmniej jeden arkusz do zaimportowania."
+        sheets_imported: "Arkusze zaimportowane. Sprawdź dane poniżej."
+  imports:
+    xlsx:
+      column: "Kolumna %{number}"
+      computed_amount_header: "Kwota (uznanie - obciążenie)"
+      unknown_sheet: "Nie znaleziono arkusza %{sheet} w pliku."
+      missing_columns: "Wybierz kolumnę daty i kolumnę kwoty dla arkusza %{sheet}."
+    type_labels:
+      xlsx_import: "Import z Excela"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Importuj arkusz Excel"
+      import_xlsx_description: "Eksport bankowy (.xlsx), jeden arkusz na konto"
+    create:
+      xlsx_uploaded: "Arkusz przesłany. Wybierz arkusze do zaimportowania."
+      invalid_xlsx_file_type: "Nieprawidłowy typ pliku. Prześlij arkusz .xlsx."

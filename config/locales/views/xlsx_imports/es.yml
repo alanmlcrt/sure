@@ -1,0 +1,51 @@
+---
+es:
+  import:
+    sheet_selections:
+      show:
+        title: "Selecciona las hojas que importar"
+        description: "Marca las hojas que quieres importar y asigna cada una a una cuenta. Las filas de título y las columnas se detectan automáticamente: revísalas en la vista previa y pulsa Actualizar tras cambiar las filas que omitir."
+        finalize_upload: "Termina de subir el archivo."
+        invalid_file: "No hemos podido leer esta hoja de cálculo: %{message}"
+        none: "Esta hoja de cálculo no tiene hojas visibles con datos."
+        back_to_imports: "Volver a las importaciones"
+        date_format_label: "Formato de fecha"
+        number_format_label: "Formato de número"
+        signage_label: "Importes"
+        incomes_are_positive: "Los ingresos son positivos"
+        incomes_are_negative: "Los ingresos son negativos"
+        formats_hint: "Los formatos de fecha y número solo se aplican a las celdas guardadas como texto; las fechas y los números reales de Excel se leen tal cual."
+        rows_count:
+          one: "1 fila"
+          other: "%{count} filas"
+        account_label: "Cuenta"
+        create_new_account: "Crear cuenta nueva"
+        new_account_name_placeholder: "Nombre de la cuenta nueva"
+        rows_to_skip_label: "Filas que omitir"
+        date_col_label: "Columna de fecha"
+        name_col_label: "Columna de concepto"
+        amount_col_label: "Columna de importe"
+        refresh: "Actualizar"
+        import_selected: "Importar las hojas seleccionadas"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Selecciona al menos una hoja para importar."
+        sheets_imported: "Hojas importadas. Revisa tus datos a continuación."
+  imports:
+    xlsx:
+      column: "Columna %{number}"
+      computed_amount_header: "Importe (abono - cargo)"
+      unknown_sheet: "No se ha encontrado la hoja %{sheet} en el archivo."
+      missing_columns: "Elige una columna de fecha y una de importe para la hoja %{sheet}."
+    type_labels:
+      xlsx_import: "Importación de Excel"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Importar hoja de cálculo de Excel"
+      import_xlsx_description: "Exportación bancaria (.xlsx), una hoja por cuenta"
+    create:
+      xlsx_uploaded: "Hoja de cálculo subida. Selecciona las hojas que importar."
+      invalid_xlsx_file_type: "Tipo de archivo no válido. Sube una hoja de cálculo .xlsx."

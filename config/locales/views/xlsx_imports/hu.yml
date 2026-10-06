@@ -1,0 +1,51 @@
+---
+hu:
+  import:
+    sheet_selections:
+      show:
+        title: "Válaszd ki az importálandó munkalapokat"
+        description: "Jelöld be az importálandó munkalapokat, és rendelj mindegyikhez egy számlát. A címsorokat és az oszlopokat automatikusan felismerjük: ellenőrizd őket az előnézetben, és a kihagyandó sorok módosítása után kattints a Frissítés gombra."
+        finalize_upload: "Kérjük, fejezd be a fájl feltöltését."
+        invalid_file: "Nem sikerült beolvasni ezt a táblázatot: %{message}"
+        none: "Ebben a táblázatban nincs adatot tartalmazó látható munkalap."
+        back_to_imports: "Vissza az importálásokhoz"
+        date_format_label: "Dátumformátum"
+        number_format_label: "Számformátum"
+        signage_label: "Összegek"
+        incomes_are_positive: "A bevételek pozitívak"
+        incomes_are_negative: "A bevételek negatívak"
+        formats_hint: "A dátum- és számformátum csak a szövegként tárolt cellákra vonatkozik; a valódi Excel-dátumokat és -számokat változatlanul olvassuk be."
+        rows_count:
+          one: "1 sor"
+          other: "%{count} sor"
+        account_label: "Számla"
+        create_new_account: "Új számla létrehozása"
+        new_account_name_placeholder: "Az új számla neve"
+        rows_to_skip_label: "Kihagyandó sorok"
+        date_col_label: "Dátum oszlop"
+        name_col_label: "Leírás oszlop"
+        amount_col_label: "Összeg oszlop"
+        refresh: "Frissítés"
+        import_selected: "Kijelölt munkalapok importálása"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Válassz ki legalább egy importálandó munkalapot."
+        sheets_imported: "A munkalapok importálva. Ellenőrizd az adatokat alább."
+  imports:
+    xlsx:
+      column: "%{number}. oszlop"
+      computed_amount_header: "Összeg (jóváírás - terhelés)"
+      unknown_sheet: "A(z) %{sheet} munkalap nem található a fájlban."
+      missing_columns: "Válassz dátum- és összegoszlopot a(z) %{sheet} munkalaphoz."
+    type_labels:
+      xlsx_import: "Excel-importálás"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Excel-táblázat importálása"
+      import_xlsx_description: "Banki export (.xlsx), számlánként egy munkalap"
+    create:
+      xlsx_uploaded: "Táblázat feltöltve. Válaszd ki az importálandó munkalapokat."
+      invalid_xlsx_file_type: "Érvénytelen fájltípus. Tölts fel egy .xlsx táblázatot."

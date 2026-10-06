@@ -1,0 +1,53 @@
+---
+ru:
+  import:
+    sheet_selections:
+      show:
+        title: "Выберите листы для импорта"
+        description: "Отметьте листы для импорта и сопоставьте каждый со счётом. Строки заголовков и столбцы определяются автоматически: проверьте их в предпросмотре и нажмите «Обновить» после изменения числа пропускаемых строк."
+        finalize_upload: "Пожалуйста, завершите загрузку файла."
+        invalid_file: "Не удалось прочитать эту таблицу: %{message}"
+        none: "В этой таблице нет видимых листов с данными."
+        back_to_imports: "Назад к импорту"
+        date_format_label: "Формат даты"
+        number_format_label: "Формат чисел"
+        signage_label: "Суммы"
+        incomes_are_positive: "Доходы положительные"
+        incomes_are_negative: "Доходы отрицательные"
+        formats_hint: "Форматы даты и чисел важны только для ячеек, сохранённых как текст; настоящие даты и числа Excel читаются как есть."
+        rows_count:
+          one: "%{count} строка"
+          few: "%{count} строки"
+          many: "%{count} строк"
+          other: "%{count} строки"
+        account_label: "Счёт"
+        create_new_account: "Создать новый счёт"
+        new_account_name_placeholder: "Название нового счёта"
+        rows_to_skip_label: "Пропускаемые строки"
+        date_col_label: "Столбец даты"
+        name_col_label: "Столбец описания"
+        amount_col_label: "Столбец суммы"
+        refresh: "Обновить"
+        import_selected: "Импортировать выбранные листы"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Выберите хотя бы один лист для импорта."
+        sheets_imported: "Листы импортированы. Проверьте данные ниже."
+  imports:
+    xlsx:
+      column: "Столбец %{number}"
+      computed_amount_header: "Сумма (кредит - дебет)"
+      unknown_sheet: "Лист %{sheet} не найден в файле."
+      missing_columns: "Выберите столбец даты и столбец суммы для листа %{sheet}."
+    type_labels:
+      xlsx_import: "Импорт Excel"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Импортировать таблицу Excel"
+      import_xlsx_description: "Банковская выписка (.xlsx), один лист на счёт"
+    create:
+      xlsx_uploaded: "Таблица загружена. Выберите листы для импорта."
+      invalid_xlsx_file_type: "Недопустимый тип файла. Загрузите таблицу .xlsx."

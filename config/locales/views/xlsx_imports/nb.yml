@@ -1,0 +1,51 @@
+---
+nb:
+  import:
+    sheet_selections:
+      show:
+        title: "Velg ark som skal importeres"
+        description: "Kryss av arkene som skal importeres, og knytt hvert av dem til en konto. Tittelrader og kolonner oppdages automatisk: sjekk dem i forhåndsvisningen, og trykk Oppdater etter å ha endret radene som skal hoppes over."
+        finalize_upload: "Fullfør filopplastingen."
+        invalid_file: "Vi kunne ikke lese dette regnearket: %{message}"
+        none: "Dette regnearket har ingen synlige ark med data."
+        back_to_imports: "Tilbake til importer"
+        date_format_label: "Datoformat"
+        number_format_label: "Tallformat"
+        signage_label: "Beløp"
+        incomes_are_positive: "Inntekter er positive"
+        incomes_are_negative: "Inntekter er negative"
+        formats_hint: "Dato- og tallformater gjelder bare celler som er lagret som tekst; ekte Excel-datoer og -tall leses som de er."
+        rows_count:
+          one: "1 rad"
+          other: "%{count} rader"
+        account_label: "Konto"
+        create_new_account: "Opprett ny konto"
+        new_account_name_placeholder: "Navn på ny konto"
+        rows_to_skip_label: "Rader som skal hoppes over"
+        date_col_label: "Datokolonne"
+        name_col_label: "Beskrivelseskolonne"
+        amount_col_label: "Beløpskolonne"
+        refresh: "Oppdater"
+        import_selected: "Importer valgte ark"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Velg minst ett ark å importere."
+        sheets_imported: "Arkene er importert. Se gjennom dataene nedenfor."
+  imports:
+    xlsx:
+      column: "Kolonne %{number}"
+      computed_amount_header: "Beløp (inn - ut)"
+      unknown_sheet: "Fant ikke arket %{sheet} i filen."
+      missing_columns: "Velg en datokolonne og en beløpskolonne for arket %{sheet}."
+    type_labels:
+      xlsx_import: "Excel-import"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Importer Excel-regneark"
+      import_xlsx_description: "Bankeksport (.xlsx), ett ark per konto"
+    create:
+      xlsx_uploaded: "Regnearket er lastet opp. Velg arkene som skal importeres."
+      invalid_xlsx_file_type: "Ugyldig filtype. Last opp et .xlsx-regneark."
