@@ -1,0 +1,51 @@
+---
+pt-PT:
+  import:
+    sheet_selections:
+      show:
+        title: "Selecione as folhas a importar"
+        description: "Assinale as folhas a importar e associe cada uma a uma conta. As linhas de título e as colunas são detetadas automaticamente: verifique-as na pré-visualização e clique em Atualizar depois de alterar as linhas a ignorar."
+        finalize_upload: "Conclua o carregamento do ficheiro."
+        invalid_file: "Não foi possível ler esta folha de cálculo: %{message}"
+        none: "Esta folha de cálculo não tem folhas visíveis com dados."
+        back_to_imports: "Voltar às importações"
+        date_format_label: "Formato de data"
+        number_format_label: "Formato de número"
+        signage_label: "Montantes"
+        incomes_are_positive: "As receitas são positivas"
+        incomes_are_negative: "As receitas são negativas"
+        formats_hint: "Os formatos de data e número só se aplicam a células guardadas como texto; as datas e os números reais do Excel são lidos tal como estão."
+        rows_count:
+          one: "1 linha"
+          other: "%{count} linhas"
+        account_label: "Conta"
+        create_new_account: "Criar nova conta"
+        new_account_name_placeholder: "Nome da nova conta"
+        rows_to_skip_label: "Linhas a ignorar"
+        date_col_label: "Coluna de data"
+        name_col_label: "Coluna de descrição"
+        amount_col_label: "Coluna de montante"
+        refresh: "Atualizar"
+        import_selected: "Importar as folhas selecionadas"
+        no_column: "—"
+      update:
+        no_sheets_selected: "Selecione pelo menos uma folha para importar."
+        sheets_imported: "Folhas importadas. Reveja os seus dados abaixo."
+  imports:
+    xlsx:
+      column: "Coluna %{number}"
+      computed_amount_header: "Montante (crédito - débito)"
+      unknown_sheet: "A folha %{sheet} não foi encontrada no ficheiro."
+      missing_columns: "Escolha uma coluna de data e uma de montante para a folha %{sheet}."
+    type_labels:
+      xlsx_import: "Importação do Excel"
+    table:
+      row:
+        type_labels:
+          xlsx_import: "Excel"
+    new:
+      import_xlsx: "Importar folha de cálculo do Excel"
+      import_xlsx_description: "Exportação bancária (.xlsx), uma folha por conta"
+    create:
+      xlsx_uploaded: "Folha de cálculo carregada. Selecione as folhas a importar."
+      invalid_xlsx_file_type: "Tipo de ficheiro inválido. Carregue uma folha de cálculo .xlsx."
