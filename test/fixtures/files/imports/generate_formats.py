@@ -142,7 +142,20 @@ put(wb.create_sheet("unknown_amount_header"), 1, 1, [
     [D(2024, 2, 2), "Remboursement", 15.0],
 ])
 
-# 15. Notes only, no table.
+# 15. Merged title/banner cells: the exporter repeats the merged value in
+# every covered cell, including a banner between the header and the data.
+put(wb.create_sheet("merged_banners"), 1, 1, [
+    ["Encours prélevé : Fin août 2026"] * 3,
+    ["R.I.B. : 10278 02619 00099999901 - 08/2026"] * 3,
+    [],
+    ["Liste de vos comptes"] * 3,
+    ["Date", "Libellé", "Montant", "Dev"],
+    ["Carte Mastercard XXXXXXXXXXXX9999 (EUR)"] * 4,
+    [D(2026, 8, 18), "OPENAI CHATGPT", -23.0, "EUR"],
+    [D(2026, 8, 17), "ENTERPRISE RENT", 200.0, "EUR"],
+])
+
+# 16. Notes only, no table.
 put(wb.create_sheet("notes_only"), 1, 1, [
     ["Ce fichier a été généré automatiquement."],
     ["Aucune opération sur la période."],
